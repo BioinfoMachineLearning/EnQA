@@ -6,4 +6,4 @@
 
  [AlphaFold2 predicted PDBs](https://drive.google.com/file/d/1E-ktBms7U_frxEXX9SxFnH97zPjIDyVd/view?usp=sharing)
  
-There are file models generated for each target, the filename format is [Target ID].relaxed_model_[1-5].pdb 
+There are 5 models generated for each target, the filename format is [Target ID].relaxed_model_[1-5].pdb 
