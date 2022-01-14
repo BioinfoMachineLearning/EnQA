@@ -1,0 +1,530 @@
+#!/bin/bash
+
+function print_help_and_exit
+{
+cat >&2 << EOF
+
+'voronota-cadscore' script is an implementation of CAD-score method using Voronota.
+
+Basic options:
+    --input-target | -t             string   *  input target structure file in PDB or mmCIF format
+    --input-model | -m              string   *  input model structure file in PDB format
+    --input-filter-query            string      input atoms filtering query parameters
+    --filter-model-by-target                    flag to filter model residues by the set of target residue IDs
+    --output-residue-scores         string      output text file with residue scores
+    --output-residue-scores-pdb-t   string      output target PDB file with residue scores as B-factors
+    --output-residue-scores-pdb-m   string      output model PDB file with residue scores as B-factors
+    --smoothing-window              number      residue scores smoothing window size, default is 0
+    --contacts-query                string      contacts query parameters
+    --contacts-query-inter-chain                flag to consider only inter-chain contacts
+    --contacts-query-by-code        string      contacts query code, possible codes are AA, AS, SS, AM, MM, MS
+    --use-all-query-codes                       flag to output global scores for all query codes, one line per code
+    --cache-dir                     string      path to cache directory
+    --output-header                             flag to output header before result line
+    --help | -h                                 flag to display help message and exit
+
+Advanced options:
+    --ignore-residue-names                      flag to consider just residue numbers and ignore residue names
+    --enable-site-based-scoring                 falg to enable site-based scoring
+    --multiple-models                           flag to handle multiple models in PDB file as an assembly
+    --input-model-chains-renaming               input text file with renaming rules for chains
+    --remap-chains                              flag to automatically rearrange chain names for higher scores
+    --remap-chains-output           string      output file with chain names rearrangement
+    --neighborhood-depth            number      number of layers to for per-residue scoring, default is 0
+    --old-regime                                flag to calculate areas as in pre-Voronota CAD-score
+
+Standard output (one line):
+    {target file path} {model file path} {query code} {number of residues} {global score} {target total area} {corresponding model total area}
+    [ {site-based number of residues} {site-based global score} {site-based target total area} {corresponding site-based model total area} ]
+
+EOF
+exit 1
+}
+
+readonly ZEROARG=$0
+INFILE_TARGET_PDB=""
+INFILE_MODEL_PDB=""
+INPUT_FILTER_QUERY_PARAMETERS=""
+FILTER_MODEL_BY_TARGET=false
+CONTACTS_QUERY_PARAMETERS=""
+CONTACTS_QUERY_BY_CODE=""
+CONTACTS_QUERY_INTER_CHAIN=false
+IGNORE_RESIDUE_NAMES_OPTION=""
+OUTFILE_RESIDUE_SCORES=""
+OUTFILE_RESIDUE_SCORES_PDB_TARGET=""
+OUTFILE_RESIDUE_SCORES_PDB_MODEL=""
+USE_ALL_QUERY_CODES=false
+SMOOTHING_WINDOW="0"
+CONTACTS_CACHE_DIRECTORY=""
+MULTIPLE_MODELS_CHAINS_OPTION=""
+INPUT_MODEL_CHAINS_RENAMING=""
+REMAP_CHAINS=false
+REMAP_CHAINS_LOG_OPTION=""
+REMAP_CHAINS_OUTPUT=""
+NEIGHBORHOOD_DEPTH="0"
+ENABLE_SITE_BASED_SCORING=false
+OUTPUT_HEADER=false
+OLD_REGIME=false
+HELP_MODE=false
+
+while [[ $# > 0 ]]
+do
+	OPTION="$1"
+	OPTARG="$2"
+	shift
+	case $OPTION in
+	-t|--input-target)
+		INFILE_TARGET_PDB="$OPTARG"
+		shift
+		;;
+	-m|--input-model)
+		INFILE_MODEL_PDB="$OPTARG"
+		shift
+		;;
+	--input-filter-query)
+		INPUT_FILTER_QUERY_PARAMETERS="$OPTARG"
+		shift
+		;;
+	--filter-model-by-target)
+		FILTER_MODEL_BY_TARGET=true
+		;;
+	--contacts-query)
+		CONTACTS_QUERY_PARAMETERS="$OPTARG"
+		shift
+		;;
+	--contacts-query-by-code)
+		CONTACTS_QUERY_BY_CODE="$OPTARG"
+		shift
+		;;
+	--contacts-query-inter-chain)
+		CONTACTS_QUERY_INTER_CHAIN=true
+		;;
+	--ignore-residue-names)
+		IGNORE_RESIDUE_NAMES_OPTION="--ignore-residue-names"
+		;;
+	--output-residue-scores)
+		OUTFILE_RESIDUE_SCORES="$OPTARG"
+		shift
+		;;
+	--output-residue-scores-pdb-t)
+		OUTFILE_RESIDUE_SCORES_PDB_TARGET="$OPTARG"
+		shift
+		;;
+	--output-residue-scores-pdb-m)
+		OUTFILE_RESIDUE_SCORES_PDB_MODEL="$OPTARG"
+		shift
+		;;
+	--use-all-query-codes)
+		USE_ALL_QUERY_CODES=true
+		;;
+	--smoothing-window)
+		SMOOTHING_WINDOW="$OPTARG"
+		shift
+		;;
+	--cache-dir)
+		CONTACTS_CACHE_DIRECTORY="$OPTARG"
+		shift
+		;;
+	--multiple-models)
+		MULTIPLE_MODELS_CHAINS_OPTION="--multimodel-chains"
+		;;
+	--input-model-chains-renaming)
+		INPUT_MODEL_CHAINS_RENAMING="$OPTARG"
+		shift
+		;;
+	--remap-chains)
+		REMAP_CHAINS=true
+		;;
+	--remap-chains-log)
+		REMAP_CHAINS_LOG_OPTION="--remap-chains-log"
+		;;
+	--remap-chains-output)
+		REMAP_CHAINS_OUTPUT="$OPTARG"
+		shift
+		;;
+	--neighborhood-depth)
+		NEIGHBORHOOD_DEPTH="$OPTARG"
+		shift
+		;;
+	--enable-site-based-scoring)
+		ENABLE_SITE_BASED_SCORING=true
+		;;
+	--output-header)
+		OUTPUT_HEADER=true
+		;;
+	--old-regime)
+		OLD_REGIME=true
+		;;
+	-h|--help)
+		HELP_MODE=true
+		;;
+	*)
+		echo >&2 "Error: invalid command line option '$OPTION'"
+		exit 1
+		;;
+	esac
+done
+
+if [ -z "$INFILE_TARGET_PDB" ] || [ -z "$INFILE_MODEL_PDB" ] || $HELP_MODE
+then
+	print_help_and_exit
+fi
+
+if [[ $ZEROARG == *"/"* ]]
+then
+	cd $(dirname $ZEROARG)
+	export PATH=$(pwd):$PATH
+	cd - &> /dev/null
+fi
+
+command -v voronota &> /dev/null || { echo >&2 "Error: 'voronota' executable not in binaries path"; exit 1; }
+command -v voronota-resources &> /dev/null || { echo >&2 "Error: 'voronota-resources' executable not in binaries path"; exit 1; }
+
+MD5SUM_COMMAND="md5sum"
+if command -v md5sum &> /dev/null
+then
+	MD5SUM_COMMAND="md5sum"
+else
+	MD5SUM_COMMAND="md5"
+fi
+command -v $MD5SUM_COMMAND &> /dev/null || { echo >&2 "Error: 'md5sum' or 'md5' executable not in binaries path"; exit 1; }
+
+if [ ! -s "$INFILE_TARGET_PDB" ]
+then
+	echo >&2 "Error: input target file does not exist"
+	exit 1
+fi
+
+if [ ! -s "$INFILE_MODEL_PDB" ]
+then
+	echo >&2 "Error: input model file does not exist"
+	exit 1
+fi
+
+if [ -n "$CONTACTS_QUERY_BY_CODE" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "AA" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "AS" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "SS" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "AM" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "MM" ] \
+   && [ "$CONTACTS_QUERY_BY_CODE" != "MS" ]
+then
+	echo >&2 "Error: invalid contacts query code '$CONTACTS_QUERY_BY_CODE'"
+	exit 1
+fi
+
+if [ -n "$INPUT_MODEL_CHAINS_RENAMING" ] && [ ! -s "$INPUT_MODEL_CHAINS_RENAMING" ]
+then
+	echo >&2 "Error: input model chains renaming file does not exist"
+	exit 1
+fi
+
+if $CONTACTS_QUERY_INTER_CHAIN
+then
+	CONTACTS_QUERY_PARAMETERS="$CONTACTS_QUERY_PARAMETERS --no-same-chain"
+fi
+
+readonly TMPLDIR=$(mktemp -d)
+trap "rm -r $TMPLDIR" EXIT
+
+voronota-resources radii > "$TMPLDIR/radii"
+
+if [ ! -s "$TMPLDIR/radii" ]
+then
+	echo >&2 "Error: failed to get the predefined atomic radii"
+	exit 1
+fi
+
+{
+	if [[ "$INFILE_TARGET_PDB" == *".gz" ]]
+	then
+		zcat "$INFILE_TARGET_PDB"
+	else
+		cat "$INFILE_TARGET_PDB"
+	fi
+} > $TMPLDIR/target
+
+{
+	if [[ "$INFILE_MODEL_PDB" == *".gz" ]]
+	then
+		zcat "$INFILE_MODEL_PDB"
+	else
+		cat "$INFILE_MODEL_PDB"
+	fi
+} > $TMPLDIR/model
+
+for WORKFILE_BASE in target model
+do
+	WORKFILE="${TMPLDIR}/${WORKFILE_BASE}"
+	
+	cat "$WORKFILE" \
+	| voronota get-balls-from-atoms-file \
+	  --input-format detect \
+	  --annotated $MULTIPLE_MODELS_CHAINS_OPTION \
+	  --radii-file $TMPLDIR/radii \
+	  --include-heteroatoms \
+	| voronota query-balls \
+	  --drop-altloc-indicators \
+	  --drop-atom-serials \
+	| voronota query-balls $INPUT_FILTER_QUERY_PARAMETERS \
+	> "${WORKFILE}.balls"
+	
+	if [ ! -s "${WORKFILE}.balls" ]
+	then
+		echo >&2 "Error: no atoms for $WORKFILE_BASE"
+		exit 1
+	fi
+done
+	
+if $FILTER_MODEL_BY_TARGET
+then
+	cat "${TMPLDIR}/target.balls" \
+	| awk '{print $1}' \
+	| voronota expand-descriptors \
+	| awk '{printf "c<%s>r<%s>i<%s>\n", $1, $2, $3}' \
+	| sed 's/.<\.>//g' \
+	| sort \
+	| uniq \
+	> "${TMPLDIR}/target_residue_ids"
+	
+	cat "${TMPLDIR}/model.balls" \
+	| voronota query-balls \
+	  --match-external-annotations "${TMPLDIR}/target_residue_ids" \
+	> "${TMPLDIR}/model.balls_filtered"
+	
+	if [ ! -s "${TMPLDIR}/model.balls_filtered" ]
+	then
+		echo >&2 "Error: input model file has no residue with IDs as in target"
+		exit 1
+	fi
+	
+	mv "${TMPLDIR}/model.balls_filtered" "${TMPLDIR}/model.balls"
+fi
+
+for WORKFILE_BASE in target model
+do
+	WORKFILE="${TMPLDIR}/${WORKFILE_BASE}"
+	
+	BALLS_MD5=""
+	if [ -n "$CONTACTS_CACHE_DIRECTORY" ]
+	then
+		BALLS_MD5=$(cat $WORKFILE.balls | $MD5SUM_COMMAND | awk '{print $1}')
+		if [ -n "$BALLS_MD5" ]
+		then
+			if $OLD_REGIME
+			then
+				BALLS_MD5="${BALLS_MD5}.voronota.cadscore.old"
+			else
+				BALLS_MD5="${BALLS_MD5}.voronota.cadscore"
+			fi
+			if [ -s "$CONTACTS_CACHE_DIRECTORY/$BALLS_MD5" ]
+			then
+				cp $CONTACTS_CACHE_DIRECTORY/$BALLS_MD5 $WORKFILE.all_contacts
+			fi
+		fi
+	fi
+
+	if [ ! -s "$WORKFILE.all_contacts" ]
+	then
+		MAIN_CHAIN_ATOMS_DESCRIPTOR="A<CA,C,N,O,OXT>|A<OP3,O3P,P,OP1,O1P,OP2,O2P,O5',O5*,C5',C5*,C4',C4*,O4',O4*,C3',C3*,O3',O3*,C2',C2*,O2',O2*,C1',C1*>"
+		
+		cat $WORKFILE.balls \
+		| \
+		{
+			if $OLD_REGIME
+			then
+				voronota calculate-contacts \
+				  --annotated \
+				  --old-contacts-output $WORKFILE.old_contacts \
+				> /dev/null
+				cat $WORKFILE.old_contacts
+			else
+				voronota calculate-contacts \
+				  --annotated
+			fi
+		} \
+		| voronota query-contacts \
+		  --match-min-seq-sep 1 \
+		  --no-solvent \
+		| voronota query-contacts \
+		  --match-first 'A<C>' \
+		  --match-second 'A<N>' \
+		  --match-max-seq-sep 1 \
+		  --match-max-dist 1.6 \
+		  --invert \
+		| voronota query-contacts \
+		  --set-tags 'AA' \
+		| voronota query-contacts \
+		  --match-first-not $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --match-second-not $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --set-tags 'SS' \
+		| voronota query-contacts \
+		  --match-first $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --match-second $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --set-tags 'MM' \
+		| voronota query-contacts \
+		  --match-first-not 'l<m>' \
+		  --match-second $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --set-tags 'AM' \
+		| voronota query-contacts \
+		  --match-first-not 'l<m>' \
+		  --match-second-not $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --set-tags 'AS' \
+		| voronota query-contacts \
+		  --match-first $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --match-first-not 'l<m>' \
+		  --match-second-not $MAIN_CHAIN_ATOMS_DESCRIPTOR \
+		  --set-tags 'MS' \
+		> $WORKFILE.all_contacts
+		
+		if [ -n "$CONTACTS_CACHE_DIRECTORY" ] && [ -n "$BALLS_MD5" ]
+		then
+			mkdir -p $CONTACTS_CACHE_DIRECTORY
+			cp $WORKFILE.all_contacts $CONTACTS_CACHE_DIRECTORY/$BALLS_MD5
+		fi
+	fi
+	
+	cat $WORKFILE.all_contacts \
+	| voronota query-contacts $CONTACTS_QUERY_PARAMETERS \
+	> $WORKFILE.contacts
+	
+	if [ ! -s "$WORKFILE.contacts" ]
+	then
+		echo >&2 "Error: no contacts for $(basename $WORKFILE)"
+		exit 1
+	fi
+done
+
+function rename_model_chains_by_dictionary()
+{
+	cat "$1" | awk '{print "c<" $1 "> c_replaced<" $2 ">" }' > $TMPLDIR/chains_renaming_dictionary
+	for MFILE in $TMPLDIR/model.balls $TMPLDIR/model.contacts
+	do
+		awk 'NR==FNR{rep[$1]=$2;next}{for(key in rep){gsub(key,rep[key])};print}' $TMPLDIR/chains_renaming_dictionary $MFILE | sed 's/_replaced//g' > $MFILE.renamed
+		mv $MFILE.renamed $MFILE
+	done
+}
+
+if [ -n "$INPUT_MODEL_CHAINS_RENAMING" ]
+then
+	rename_model_chains_by_dictionary "$INPUT_MODEL_CHAINS_RENAMING"
+fi
+
+STANDARD_OPTIONS_FOR_COMPARE_CONTACTS="--depth $NEIGHBORHOOD_DEPTH --residue-level-only --detailed-output $IGNORE_RESIDUE_NAMES_OPTION"
+
+if $REMAP_CHAINS
+then
+	cat $TMPLDIR/model.contacts \
+	| voronota compare-contacts $STANDARD_OPTIONS_FOR_COMPARE_CONTACTS --remap-chains --remapped-chains-file $TMPLDIR/remapped_chains $REMAP_CHAINS_LOG_OPTION \
+	  --target-contacts-file $TMPLDIR/target.contacts \
+	> /dev/null
+	
+	rename_model_chains_by_dictionary "$TMPLDIR/remapped_chains"
+	
+	if [ -n "$REMAP_CHAINS_OUTPUT" ]
+	then
+		mkdir -p $(dirname "$REMAP_CHAINS_OUTPUT")
+		cp "$TMPLDIR/remapped_chains" "$REMAP_CHAINS_OUTPUT"
+	fi
+fi
+
+if [ -n "$OUTFILE_RESIDUE_SCORES" ] || [ -n "$OUTFILE_RESIDUE_SCORES_PDB_TARGET" ] || [ -n "$OUTFILE_RESIDUE_SCORES_PDB_MODEL" ]
+then
+	CONTACTS_QUERY_PARAMETERS_MORE=""
+	if [ -n "$CONTACTS_QUERY_BY_CODE" ]
+	then
+		CONTACTS_QUERY_PARAMETERS_MORE="--match-tags $CONTACTS_QUERY_BY_CODE"
+	fi
+
+	cat $TMPLDIR/model.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE \
+	| voronota compare-contacts $STANDARD_OPTIONS_FOR_COMPARE_CONTACTS \
+	  --target-contacts-file <(cat $TMPLDIR/target.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE) \
+	  --smoothing-window $SMOOTHING_WINDOW \
+	  --smoothed-scores-file $TMPLDIR/smoothed_residue_cad_scores \
+	> /dev/null
+
+	if [ -n "$OUTFILE_RESIDUE_SCORES" ]
+	then
+		mkdir -p $(dirname $OUTFILE_RESIDUE_SCORES)
+		cp $TMPLDIR/smoothed_residue_cad_scores "$OUTFILE_RESIDUE_SCORES"
+	fi
+	
+	if [ -n "$OUTFILE_RESIDUE_SCORES_PDB_TARGET" ]
+	then
+		mkdir -p $(dirname "$OUTFILE_RESIDUE_SCORES_PDB_TARGET")
+		cat $TMPLDIR/target.balls \
+		| voronota query-balls \
+		  --set-external-adjuncts $TMPLDIR/smoothed_residue_cad_scores \
+		  --set-external-adjuncts-name score \
+		| voronota write-balls-to-atoms-file \
+		  --pdb-output "$OUTFILE_RESIDUE_SCORES_PDB_TARGET" \
+		  --pdb-output-b-factor score \
+		> /dev/null
+	fi
+
+	if [ -n "$OUTFILE_RESIDUE_SCORES_PDB_MODEL" ]
+	then
+		mkdir -p $(dirname "$OUTFILE_RESIDUE_SCORES_PDB_MODEL")
+		cat $TMPLDIR/model.balls \
+		| voronota query-balls \
+		  --set-external-adjuncts $TMPLDIR/smoothed_residue_cad_scores \
+		  --set-external-adjuncts-name score \
+		| voronota write-balls-to-atoms-file \
+		  --pdb-output "$OUTFILE_RESIDUE_SCORES_PDB_MODEL" \
+		  --pdb-output-b-factor score \
+		> /dev/null
+	fi
+fi
+
+QCODES=(AA)
+
+if [ -n "$CONTACTS_QUERY_BY_CODE" ]
+then
+	QCODES=($CONTACTS_QUERY_BY_CODE)
+fi
+
+if $USE_ALL_QUERY_CODES
+then
+	QCODES=(AA AS SS AM MM MS)
+fi
+
+if $OUTPUT_HEADER
+then
+	HEADER="target_file model_file query_code residues score target_area model_area"
+	if $ENABLE_SITE_BASED_SCORING
+	then
+		HEADER="$HEADER site_residues site_score site_target_area site_model_area"
+	fi
+	echo "$HEADER"
+fi
+
+for QCODE in "${QCODES[@]}"
+do
+	CONTACTS_QUERY_PARAMETERS_MORE="--match-tags $QCODE"
+	
+	cat $TMPLDIR/model.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE \
+	| voronota compare-contacts $STANDARD_OPTIONS_FOR_COMPARE_CONTACTS \
+	  --target-contacts-file <(cat $TMPLDIR/target.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE) \
+	> $TMPLDIR/global_cad_scores_$QCODE
+	
+	if $ENABLE_SITE_BASED_SCORING
+	then
+		cat $TMPLDIR/model.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE | voronota query-contacts --summarize-by-first $CONTACTS_QUERY_PARAMETERS \
+		| voronota compare-contacts $STANDARD_OPTIONS_FOR_COMPARE_CONTACTS \
+		  --target-contacts-file <(cat $TMPLDIR/target.contacts | voronota query-contacts $CONTACTS_QUERY_PARAMETERS_MORE | voronota query-contacts --summarize-by-first $CONTACTS_QUERY_PARAMETERS) \
+		> $TMPLDIR/site_based_global_cad_scores_$QCODE
+	fi
+	
+	{
+		echo $INFILE_TARGET_PDB $INFILE_MODEL_PDB $QCODE
+		cat $TMPLDIR/global_cad_scores_$QCODE | egrep '^residue_count ' | awk '{print $2}'
+		cat $TMPLDIR/global_cad_scores_$QCODE | egrep '^residue_level_global ' | awk '{print $2 " " $3 " " $7}'
+		if $ENABLE_SITE_BASED_SCORING
+		then
+			cat $TMPLDIR/site_based_global_cad_scores_$QCODE | egrep '^residue_count ' | awk '{print $2}'
+			cat $TMPLDIR/site_based_global_cad_scores_$QCODE | egrep '^residue_level_global ' | awk '{print $2 " " $3 " " $7}'
+		fi
+	} \
+	| tr '\n' ' ' \
+	| sed 's/\s$/\n/'
+done

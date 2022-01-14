@@ -1,0 +1,28 @@
+2021-10-31T19:58:41:756312 | START	| Start building S-GCN features
+2021-10-31T19:58:42:527966 | INFO	| Checking and preparation took 0.08 seconds
+2021-10-31T19:58:43:963650 | INFO	| Runnning of Voronota took 1.43 seconds
+2021-10-31T19:58:44:067866 | INFO	| Computing of covalent bonds took 0.10 seconds
+2021-10-31T19:58:44:072233 | INFO	| Correction of matrices took 0.00 seconds
+2021-10-31T19:58:44:076571 | INFO	| Computing of sequence-separation matrix took 0.00 seconds
+2021-10-31T19:58:44:105820 | INFO	| Output atom-level files reformatting took 0.03 seconds
+2021-10-31T19:58:47:930160 | START	| Start building S-GCN features
+2021-10-31T19:58:48:882474 | INFO	| Checking and preparation took 0.08 seconds
+2021-10-31T19:58:50:083575 | INFO	| Runnning of Voronota took 1.20 seconds
+2021-10-31T19:58:50:159982 | INFO	| Computing of covalent bonds took 0.07 seconds
+2021-10-31T19:58:50:163643 | INFO	| Correction of matrices took 0.00 seconds
+2021-10-31T19:58:50:167519 | INFO	| Computing of sequence-separation matrix took 0.00 seconds
+2021-10-31T19:58:50:190253 | INFO	| Output atom-level files reformatting took 0.02 seconds
+2021-10-31T19:58:53:813330 | START	| Start building S-GCN features
+2021-10-31T19:58:54:529301 | INFO	| Checking and preparation took 0.08 seconds
+2021-10-31T19:58:55:917523 | INFO	| Runnning of Voronota took 1.39 seconds
+2021-10-31T19:58:56:010740 | INFO	| Computing of covalent bonds took 0.09 seconds
+2021-10-31T19:58:56:014740 | INFO	| Correction of matrices took 0.00 seconds
+2021-10-31T19:58:56:018778 | INFO	| Computing of sequence-separation matrix took 0.00 seconds
+2021-10-31T19:58:56:046744 | INFO	| Output atom-level files reformatting took 0.03 seconds
+2021-10-31T19:58:59:802234 | START	| Start building S-GCN features
+2021-10-31T19:59:00:983057 | INFO	| Checking and preparation took 0.09 seconds
+2021-10-31T19:59:02:223729 | INFO	| Runnning of Voronota took 1.24 seconds
+2021-10-31T19:59:02:338443 | INFO	| Computing of covalent bonds took 0.11 seconds
+2021-10-31T19:59:02:342510 | INFO	| Correction of matrices took 0.00 seconds
+2021-10-31T19:59:02:346733 | INFO	| Computing of sequence-separation matrix took 0.00 seconds
+2021-10-31T19:59:02:372821 | INFO	| Output atom-level files reformatting took 0.02 seconds
