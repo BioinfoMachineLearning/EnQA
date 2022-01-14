@@ -29,4 +29,4 @@ Running on a model under example folder
 python3 predict.py --input example/model/6KYTP/test_model.pdb --output outputs/prediction/ --model_path models/egnn_ne.tar --disto_type esto9 --model_type egnn_ne --alphafold_prediction example/alphafold_prediction/6KYTP/
 ```
 
-If you want to run models based on SE(3)-Transformer, then Python package equivariant_attention is required, which can be found at [Fibian's implementation](https://github.com/FabianFuchsML/se3-transformer-public).
+If you want to run models based on [SE(3)-Transformer](https://arxiv.org/abs/2006.10503), then Python package equivariant_attention is required, and should be installed following [Fibian's implementation](https://github.com/FabianFuchsML/se3-transformer-public).
