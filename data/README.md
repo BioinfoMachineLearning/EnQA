@@ -1,4 +1,4 @@
-# PDB files for trianing and testing on AlphaFold2 predictions datset.
+# PDB files for training and testing on AlphaFold2 predictions datset.
 
  The PDB files can be downloaded using the following links:
 
