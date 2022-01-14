@@ -1,3 +1,9 @@
+# Part of the convolution layers and l-DDT computation are modified from DeepAccNet
+# Improved protein structure refinement guided by deep learning based accuracy estimation
+# Naozumi Hiranuma, Hahnbeom Park, Minkyung Baek,  View ORCID ProfileIvan Anishchanka, Justas Dauparas, David Baker
+# Nature Communications doi: 10.1038/s41467-021-21511-x
+# https://github.com/hiranumn/DeepAccNet
+
 import torch
 from torch.nn import functional as F
 
@@ -19,6 +25,7 @@ def task_corr(pred, target):
     vy = target - torch.mean(target)
     corr = torch.sum(vx * vy) / (torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
     return corr
+
 
 
 class resEGNN(torch.nn.Module):
