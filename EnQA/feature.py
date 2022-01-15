@@ -64,6 +64,19 @@ def linear_recreate_c(ca_pos, cb_pos, n_pos):
     return np.matmul(np.linalg.inv(A), y) + np.array(ca_pos)
 
 
+def get_idx_mask(input_model_path, af2_pdb):
+    pdb_input = PandasPdb().read_pdb(input_model_path)
+    pdb_af2 = PandasPdb().read_pdb(af2_pdb)
+    input_idx = pdb_input.df['ATOM']['residue_number'].to_numpy()
+    af2_idx = pdb_af2.df['ATOM']['residue_number'].to_numpy()
+    input_idx = np.unique(input_idx)
+    af2_idx = np.unique(af2_idx)
+    if not np.all(np.isin(input_idx, af2_idx)):
+        raise IndexError('Model from AlphaFold2 should contain all indices in input PDB.')
+    return np.isin(af2_idx, input_idx)
+
+
+
 def restore_pdb(pdb_test, pdb_template, outfile):
     template_biopdb = PandasPdb().read_pdb(pdb_template)
     test_biopdb = PandasPdb().read_pdb(pdb_test)
@@ -232,7 +245,7 @@ def process_data(input_model_path, output_feature_path, template_path=None,
 def create_feature(input_model_path, output_feature_path, template_path=None,
                    diff_cutoff=15, coordinate_factor=0.01, disto_type='base',
                    alphafold_prediction_path=None, lddt_cmd='utils/lddt',
-                   alphafold_prediction_cache=None):
+                   alphafold_prediction_cache=None, af2_pdb=''):
     if disto_type == 'base':
         one_hot, features, pos, sh, disto_feature, el_src, el_dst = process_data(input_model_path,
                                                                                  output_feature_path,
@@ -256,6 +269,10 @@ def create_feature(input_model_path, output_feature_path, template_path=None,
                                                                                                alphafold_prediction_cache=alphafold_prediction_cache
                                                                                                )
         sh_data = expand_sh(sh, pos.shape[0])
+        if af2_pdb != '':
+            mask = get_idx_mask(input_model_path, af2_pdb)
+            plddt = plddt[:, mask]
+            af2_2d = af2_2d[:, mask, :][:, :, mask]
         f1d = np.concatenate((one_hot, features, plddt, af2_qa), axis=0)
         f2d = np.concatenate((sh_data, af2_2d), axis=0)
         return f1d, f2d, pos, (el_src, el_dst), cmap

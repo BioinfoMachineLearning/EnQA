@@ -15,6 +15,8 @@ if __name__ == '__main__':
     parser.add_argument('--model_type', type=str, required=False, default='egnn')
     parser.add_argument('--alphafold_prediction', type=str, required=False, default='')
     parser.add_argument('--alphafold_feature_cache', type=str, required=False, default='')
+    parser.add_argument('--af2_pdb', type=str, required=False, default='',
+                        help='Optional. PDBs from AlphaFold2 predcition for index correction with input pdb')
 
     args = parser.parse_args()
     if args.alphafold_feature_cache == '':
@@ -39,7 +41,8 @@ if __name__ == '__main__':
         f1d, f2d, pos, el, cmap = create_feature(input_model_path=args.input, output_feature_path=args.output,
                                                  disto_type=args.disto_type,
                                                  alphafold_prediction_path=args.alphafold_prediction,
-                                                 alphafold_prediction_cache=args.alphafold_feature_cache)
+                                                 alphafold_prediction_cache=args.alphafold_feature_cache,
+                                                 af2_pdb=args.af2_pdb)
         if args.disto_type == 'disto':
             dim2d = 25 + 64 * 5
         elif args.disto_type == 'cov25':
@@ -54,6 +57,7 @@ if __name__ == '__main__':
             model = resEGNN_with_ne(dim2d=dim2d, dim1d=33)
         elif args.model_type == 'se3':
             from network.se3_model import se3_model
+
             model = se3_model(dim2d=dim2d, dim1d=33)
         else:
             raise NotImplementedError

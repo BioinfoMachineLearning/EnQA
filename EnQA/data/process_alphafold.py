@@ -90,6 +90,44 @@ def process_alphafold_target(alphafold_prediction_path, model_type, n_models=5, 
     return plddt.astype(np.float32), cmap.astype(np.float32), af2_2d.astype(np.float32)
 
 
+def process_alphafold_target_ensemble(alphafold_prediction_path, disto_types, n_models=5, cmap_cutoff_dim=42,
+                                      input_pdb_file=None):
+    data_2d = []
+    data_1d = []
+    for i in range(n_models):
+        src = os.path.join(alphafold_prediction_path, 'result_model_' + str(i + 1) + '.pkl')
+        x = pickle.load(open(src, 'rb'))
+        x2d = x['distogram']['logits']
+        x2d = softmax(x2d, axis=2)
+        data_2d.append(x2d)
+        data_1d.append(x['plddt'] / 100)
+    cmap = np.average(np.array([np.sum(i[:, :, 0:cmap_cutoff_dim], axis=2) for i in data_2d]), axis=0)
+    plddt = np.vstack(data_1d)
+    data_2d = np.concatenate(data_2d, axis=2)
+    af2_2d_dict = {}
+    if 'disto' in disto_types:
+        af2_2d = data_2d.transpose(2, 0, 1)
+        af2_2d_dict['disto'] = af2_2d.astype(np.float32)
+    if 'cov25' in disto_types:
+        l = data_2d.shape[0]
+        x = data_2d.reshape((l, l, n_models, -1))
+        m1 = x - x.sum(3, keepdims=1) / x.shape[3]
+        af2_2d = np.einsum('ijml,ijnl->ijmn', m1, m1) / (x.shape[3] - 1)
+        af2_2d = af2_2d.reshape(l, l, -1).transpose(2, 0, 1)
+        af2_2d_dict['cov25'] = af2_2d.astype(np.float32)
+    if 'cov64' in disto_types:
+        l = data_2d.shape[0]
+        x = data_2d.reshape((l, l, n_models, -1))
+        x = x.transpose(0, 1, 3, 2)
+        af2_2d = np.var(x, axis=3).transpose(2, 0, 1)
+        af2_2d_dict['cov64'] = af2_2d.astype(np.float32)
+    elif 'esto9' in disto_types:
+        af2_2d = compute_esto9(input_pdb_file, alphafold_prediction_path)
+        af2_2d_dict['esto9'] = af2_2d.astype(np.float32)
+    # shape: plddt (n_models, L) cmap(L,L) af2_2d (c, L, L)
+    return plddt.astype(np.float32), cmap.astype(np.float32), af2_2d_dict
+
+
 if __name__ == '__main__':
     input_pdb_file = 'example/model/1H8AA/test_model.pdb'
     af2_result_path = 'example/alphafold_prediction/1H8AA/'
