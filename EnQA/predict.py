@@ -57,7 +57,6 @@ if __name__ == '__main__':
             model = resEGNN_with_ne(dim2d=dim2d, dim1d=33)
         elif args.model_type == 'se3':
             from network.se3_model import se3_model
-
             model = se3_model(dim2d=dim2d, dim1d=33)
         else:
             raise NotImplementedError

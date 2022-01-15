@@ -90,7 +90,7 @@ class se3_model(torch.nn.Module):
         self.bin_num = bin_num
         self.cmap_idx = cmap_idx
         self.num_att_layers = num_att_layers
-        super(test_graph_se3, self).__init__()
+        super(se3_model, self).__init__()
 
         self.add_module("conv1d_1", torch.nn.Conv1d(dim1d, self.num_channel // 2, 1, padding=0, bias=True))
         self.add_module("conv2d_1",
