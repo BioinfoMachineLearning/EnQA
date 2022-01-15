@@ -1,4 +1,5 @@
 # EnQA
+
 A 3D-equivariant neural network for protein structure accuracy estimation
 
 
@@ -38,6 +39,16 @@ Example:
 ```
 python3 predict.py --input example/model/6KYTP/test_model.pdb --output outputs/prediction/ --model_path models/esto9_se3.tar --disto_type se3 --model_type egnn_ne --alphafold_prediction example/alphafold_prediction/6KYTP/
 ```
+
+# Feature generation using featurizers from Spherical graph convolutional networks 
+
+The featurizers from Spherical graph convolutional networks (S-GCN) are used to processe 3D models of proteins represented as molecular graphs.
+Here we provide the voronota and spherical harmonics featurizer for Linux.
+
+If you need to rebuild the voronota for a different system, please check out the [S-GCN Repo](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#voronota).
+
+Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#spherical-harmonics-featurizer) built for featurizer under a different system. (Currently, only MacOS and Linux are supported)
+
 
 # Generating AlphaFold2 models for assisted quality assessment
 
