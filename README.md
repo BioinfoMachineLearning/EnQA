@@ -20,6 +20,7 @@ optional arguments:
   --disto_type                  type of 2D features, can be "cov64", "cov25" or "esto9"
   --alphafold_prediction        path to AlphaFold2 predictions, should include files with names: result_model_[1-5].pkl
   --alphafold_feature_cache     Optional, path to temp folder which saves intermediate alphafold_features
+  --af2_pdb                     Optional. PDBs from AlphaFold2 predcition. Used for index correction when missing residues exist in input file.
 ```
 
 # Example usages
