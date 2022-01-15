@@ -4,7 +4,7 @@ A 3D-equivariant neural network for protein structure accuracy estimation
 
 ```
 usage: predict.py [-h] --input INPUT --output OUTPUT --model_path MODEL_PATH --disto_type DISTO_TYPE [--model_type MODEL_TYPE] [--alphafold_prediction ALPHAFOLD_PREDICTION]
-                  [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE]
+                  [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB_FILE]
 
 Error predictor network
 
