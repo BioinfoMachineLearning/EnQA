@@ -9,15 +9,15 @@ usage: python3 EnQA.py [-h] --input INPUT --output OUTPUT --method METHOD [--cpu
 Predict model quality and output numpy array format.
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --input INPUT         Path to input pdb file.
-  --output OUTPUT       Path to output file.
-  --method METHOD       Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.
-  --cpu                 Force to use CPU.
-  --alphafold_prediction Path to alphafold prediction results.
+  -h, --help                  show this help message and exit
+  --input INPUT               Path to input pdb file.
+  --output OUTPUT             Path to output file.
+  --method METHOD             Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.
+  --cpu                       Force to use CPU.
+  --alphafold_prediction      Path to alphafold prediction results.
                         
-  --alphafold_feature_cache Optional. Can cache AlphaFold features for models of the same sequence.
-  --af2_pdb AF2_PDB     Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
+  --alphafold_feature_cache   Optional. Can cache AlphaFold features for models of the same sequence.
+  --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
 
 # Example usages
