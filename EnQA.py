@@ -122,6 +122,24 @@ if __name__ == '__main__':
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
                 pred_lddt_all = pred_lddt_all + out / len(methods)
+            if method == 'EGNN_esto9':
+                dim2d = 25 + 45
+                model = resEGNN_with_mask(dim2d=dim2d, dim1d=33)
+                state = torch.load('models/egnn_esto9.tar', map_location=torch.device('cpu'))
+                model.load_state_dict(state['model'])
+                model.to(device)
+                model.eval()
+                f2d = np.concatenate((sh_data, dict_2d['esto9']), axis=0)
+                f1d = np.concatenate((one_hot, features, plddt, af2_qa), axis=0)
+                f1d = torch.tensor(f1d).unsqueeze(0).to(device)
+                f2d = torch.tensor(f2d).unsqueeze(0).to(device)
+                pos = torch.tensor(pos).to(device)
+                el = [torch.tensor(i).to(device) for i in el]
+                cmap = torch.tensor(cmap).to(device)
+                _, _, pred_lddt = model(f1d, f2d, pos, el, cmap)
+                out = pred_lddt.cpu().detach().numpy().astype(np.float16)
+                out[out > 1] = 1
+                pred_lddt_all = pred_lddt_all + out / len(methods)
             else:
                 raise NotImplementedError
     np.save(os.path.join(args.output, os.path.basename(args.input)), pred_lddt_all.astype(np.float16))
