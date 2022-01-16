@@ -4,24 +4,20 @@ A 3D-equivariant neural network for protein structure accuracy estimation
 
 
 ```
-usage: predict.py [-h] --input INPUT --output OUTPUT --model_path MODEL_PATH --disto_type DISTO_TYPE [--model_type MODEL_TYPE] [--alphafold_prediction ALPHAFOLD_PREDICTION]
-                  [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB_FILE]
+usage: EnQA.py [-h] --input INPUT --output OUTPUT --method METHOD [--cpu] [--alphafold_prediction ALPHAFOLD_PREDICTION] [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB]
 
-Error predictor network
-
-positional arguments:
-  input                 path to input pdb file
-  output                path to output (can be path or filename)
+Predict model quality and output numpy array format.
 
 optional arguments:
-  -h, --help                    show this help message and exit
-  --input                       path to input pdb file
-  --output                      path to output (can be path or filename)
-  --model_path                  path to model weight file
-  --disto_type                  type of 2D features, can be "cov64", "cov25" or "esto9"
-  --alphafold_prediction        path to AlphaFold2 predictions, should include files with names: result_model_[1-5].pkl
-  --alphafold_feature_cache     Optional, path to temp folder which saves intermediate alphafold_features
-  --af2_pdb                     Optional. PDBs from AlphaFold2 predcition. Used for index correction when missing residues exist in input file.
+  -h, --help            show this help message and exit
+  --input INPUT         Path to input pdb file.
+  --output OUTPUT       Path to output file.
+  --method METHOD       Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.
+  --cpu                 Force to use CPU.
+  --alphafold_prediction ALPHAFOLD_PREDICTION
+                        Path to alphafold prediction results.
+  --alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE
+  --af2_pdb AF2_PDB     Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
 
 # Example usages
@@ -37,7 +33,7 @@ If you want to run models based on [SE(3)-Transformer](https://arxiv.org/abs/200
 Example:
 
 ```
-python3 predict.py --input example/model/6KYTP/test_model.pdb --output outputs/prediction/ --model_path models/esto9_se3.tar --disto_type se3 --model_type egnn_ne --alphafold_prediction example/alphafold_prediction/6KYTP/
+python3 EnQA.py --input example/model/6KYTP/test_model.pdb --output outputs/prediction/ --method se3_Full --alphafold_prediction example/alphafold_prediction/6KYTP/  
 ```
 
 # Feature generation using featurizers from Spherical graph convolutional networks 
