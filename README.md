@@ -18,6 +18,19 @@ optional arguments:
   --alphafold_feature_cache   Optional. Can cache AlphaFold features for models of the same sequence.
   --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
+# Prerequisites
+
+biopandas==0.2.9
+
+biopython==1.79
+
+numpy==1.21.3
+
+pandas==1.3.4
+
+scipy==1.7.1
+
+torch==1.10.0
 
 # Example usages
 
