@@ -142,6 +142,5 @@ if __name__ == '__main__':
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
                 pred_lddt_all = pred_lddt_all + out / len(methods)
-            else:
-                raise NotImplementedError
+
     np.save(os.path.join(args.output, os.path.basename(args.input)), pred_lddt_all.astype(np.float16))
