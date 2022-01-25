@@ -19,6 +19,8 @@ optional arguments:
   --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
 
+You may need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
+
 # Example usages
 
 Running on a E(n)-Equivariant model under example folder:
