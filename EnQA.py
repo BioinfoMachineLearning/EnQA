@@ -71,7 +71,7 @@ if __name__ == '__main__':
             input_idx = np.array([i['rindex'] for i in pose_input])
             pose_af2 = parse_pdbfile(args.af2_pdb)
             af2_idx = np.array([i['rindex'] for i in pose_af2])
-            mask = af2_idx in input_idx
+            mask = np.isin(af2_idx, input_idx)
             af2_qa = af2_qa[:, mask]
             plddt = plddt[:, mask]
             cmap = cmap[:, mask][mask, :]
