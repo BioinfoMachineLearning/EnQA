@@ -19,7 +19,20 @@ optional arguments:
   --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
 
-You may need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
+# Recommended installation steps:
+```
+pip install biopandas biopython scipy torch==1.10.1
+
+# Optional, used by models based on SE(3)-Transformer only
+pip install dgl-cu113 -f https://data.dgl.ai/wheels/repo.html #switch to your cuda version
+pip install packaging wandb line_profiler
+pip install git+https://github.com/AMLab-Amsterdam/lie_learn
+git clone https://github.com/FabianFuchsML/se3-transformer-public.git
+cd se3-transformer-public
+pip install -e .
+```
+
+You may also need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
 
 # Example usages
 
