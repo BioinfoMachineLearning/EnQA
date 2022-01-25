@@ -90,6 +90,7 @@ if __name__ == '__main__':
             if method == 'se3_Full':
                 dim2d = 25 + 9 * 5
                 from network.se3_model import se3_model
+
                 model = se3_model(dim2d=dim2d, dim1d=33)
                 state = torch.load('models/esto9_se3.tar', map_location=torch.device('cpu'))
                 model.load_state_dict(state['model'])
@@ -143,4 +144,5 @@ if __name__ == '__main__':
                 out[out > 1] = 1
                 pred_lddt_all = pred_lddt_all + out / len(methods)
 
-    np.save(os.path.join(args.output, os.path.basename(args.input).replace('.pdb','')), pred_lddt_all.astype(np.float16))
+    np.save(os.path.join(args.output, os.path.basename(args.input).replace('.pdb', '')),
+            pred_lddt_all.astype(np.float16))
