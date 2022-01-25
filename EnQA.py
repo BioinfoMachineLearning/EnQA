@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 
 from data.loader import expand_sh
+from data.process_label import parse_pdbfile
 from feature import create_basic_features, get_base2d_feature
 from data.process_alphafold import process_alphafold_target_ensemble, process_alphafold_model
 from network.resEGNN import resEGNN, resEGNN_with_mask, resEGNN_with_ne
@@ -22,7 +23,7 @@ if __name__ == '__main__':
                         help='Path to alphafold prediction results.')
     parser.add_argument('--alphafold_feature_cache', type=str, required=False, default='')
     parser.add_argument('--af2_pdb', type=str, required=False, default='',
-                        help='Optional. PDBs from AlphaFold2 predcition for index correction with input pdb')
+                        help='Optional. PDBs from AlphaFold2 predcition for index correction with input pdb. Must contain all residues in input pdb.')
 
     args = parser.parse_args()
     if args.alphafold_feature_cache == '':
@@ -65,6 +66,17 @@ if __name__ == '__main__':
             if args.alphafold_feature_cache is not None:
                 pickle.dump({'plddt': plddt, 'cmap': cmap, 'dict_2d': dict_2d},
                             open(args.alphafold_prediction_cache, 'wb'))
+        if args.af2_pdb != '':
+            pose_input = parse_pdbfile(args.input)
+            input_idx = np.array([i['rindex'] for i in pose_input])
+            pose_af2 = parse_pdbfile(args.af2_pdb)
+            af2_idx = np.array([i['rindex'] for i in pose_af2])
+            mask = af2_idx in input_idx
+            af2_qa = af2_qa[:, mask]
+            plddt = plddt[:, mask]
+            cmap = cmap[:, mask][mask, :]
+            for f2d_type in dict_2d.keys():
+                dict_2d[f2d_type] = dict_2d[f2d_type][:, :, mask][:, mask, :]
     else:
         dict_2d['f2d_dan'] = get_base2d_feature(args.input, args.output)
     with torch.no_grad():
