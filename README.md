@@ -19,9 +19,24 @@ optional arguments:
   --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold2 predcition for index correction with input pdb
 ```
 
-You may need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
+## Requirements:
+biopandas==0.2.9
 
-# Example usages
+biopython==1.79
+
+numpy==1.21.3
+
+pandas==1.3.4
+
+scipy==1.7.1
+
+torch==1.10.0
+
+[equivariant_attention](https://github.com/FabianFuchsML/se3-transformer-public) (Optional, used by models based on SE(3)-Transformer only)
+
+You may also need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
+
+## Example usages
 
 Running on a E(n)-Equivariant model under example folder:
 
@@ -37,7 +52,7 @@ Example:
 python3 EnQA.py --input example/model/6KYTP/test_model.pdb --output outputs/ --method se3_Full --alphafold_prediction example/alphafold_prediction/6KYTP/  
 ```
 
-# Feature generation using featurizers from Spherical graph convolutional networks 
+## Feature generation using featurizers from Spherical graph convolutional networks 
 
 The featurizers from Spherical graph convolutional networks (S-GCN) are used to processe 3D models of proteins represented as molecular graphs.
 Here we provide the voronota and spherical harmonics featurizer for Linux.
@@ -47,6 +62,6 @@ If you need to rebuild the voronota for a different system, please check out the
 Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#spherical-harmonics-featurizer) built for featurizer under a different system. (Currently, only MacOS and Linux are supported)
 
 
-# Generating AlphaFold2 models for assisted quality assessment
+## Generating AlphaFold2 models for assisted quality assessment
 
 For generating models using AlphaFold2, an installation of AlphaFold2 following its [Official Repo](https://github.com/deepmind/alphafold) is required. For our experiments, we use its original model used at CASP14 with no ensembling (--model_preset=monomer), with all genetic databases used at CASP14 (--db_preset=full_dbs), and restricts templates only to structures that were available at the start of CASP14 (--max_template_date=2020-05-14).
