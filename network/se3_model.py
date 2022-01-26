@@ -1,3 +1,12 @@
+# Code modified from https://github.com/FabianFuchsML/se3-transformer-public
+# @inproceedings{fuchs2020se3transformers,
+#    title={SE(3)-Transformers: 3D Roto-Translation Equivariant Attention Networks},
+#    author={Fabian B. Fuchs and Daniel E. Worrall and Volker Fischer and Max Welling},
+#    year={2020},
+#    booktitle = {Advances in Neural Information Processing Systems 34 (NeurIPS)},
+#}
+
+
 import dgl
 import torch
 import torch.nn as nn
@@ -8,10 +17,6 @@ from equivariant_attention.fibers import Fiber
 
 from network.resnet import ResNet
 
-# Code from E(n) Equivariant Graph Neural Networks
-# Victor Garcia Satorras, Emiel Hogeboom, Max Welling
-# https://arxiv.org/abs/2102.09844
-# https://github.com/vgsatorras/egnn/blob/1a2d515e069272484b4ff51930a3d5df3eeef92b/models/egnn_clean/egnn_clean.py
 class SE3Transformer(nn.Module):
     """SE(3) equivariant GCN with attention"""
 

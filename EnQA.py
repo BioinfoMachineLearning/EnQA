@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 
 from data.loader import expand_sh
+from data.process_label import parse_pdbfile
 from feature import create_basic_features, get_base2d_feature
 from data.process_alphafold import process_alphafold_target_ensemble, process_alphafold_model
 from network.resEGNN import resEGNN, resEGNN_with_mask, resEGNN_with_ne
@@ -14,21 +15,23 @@ if __name__ == '__main__':
     parser.add_argument('--input', type=str, required=True,
                         help='Path to input pdb file.')
     parser.add_argument('--output', type=str, required=True,
-                        help='Path to output file.')
-    parser.add_argument('--method', type=str, required=True,
+                        help='Path to output folder.')
+    parser.add_argument('--method', type=str, required=False, default='EGNN_Full',
                         help='Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.')
     parser.add_argument('--cpu', action='store_true', default=False, help='Force to use CPU.')
     parser.add_argument('--alphafold_prediction', type=str, required=False, default='',
                         help='Path to alphafold prediction results.')
     parser.add_argument('--alphafold_feature_cache', type=str, required=False, default='')
     parser.add_argument('--af2_pdb', type=str, required=False, default='',
-                        help='Optional. PDBs from AlphaFold2 predcition for index correction with input pdb')
+                        help='Optional. PDBs from AlphaFold2 predcition for index correction with input pdb. Must contain all residues in input pdb.')
 
     args = parser.parse_args()
     if args.alphafold_feature_cache == '':
         args.alphafold_feature_cache = None
     device = torch.device('cuda:0') if torch.cuda.is_available() and not args.cpu else 'cpu'
     lddt_cmd = 'utils/lddt'
+    if not os.path.isdir(args.output):
+        os.mkdir(args.output)
 
     # Featureize
     methods = args.method.split(',')
@@ -63,6 +66,17 @@ if __name__ == '__main__':
             if args.alphafold_feature_cache is not None:
                 pickle.dump({'plddt': plddt, 'cmap': cmap, 'dict_2d': dict_2d},
                             open(args.alphafold_prediction_cache, 'wb'))
+        if args.af2_pdb != '':
+            pose_input = parse_pdbfile(args.input)
+            input_idx = np.array([i['rindex'] for i in pose_input])
+            pose_af2 = parse_pdbfile(args.af2_pdb)
+            af2_idx = np.array([i['rindex'] for i in pose_af2])
+            mask = np.isin(af2_idx, input_idx)
+            af2_qa = af2_qa[:, mask]
+            plddt = plddt[:, mask]
+            cmap = cmap[:, mask][mask, :]
+            for f2d_type in dict_2d.keys():
+                dict_2d[f2d_type] = dict_2d[f2d_type][:, :, mask][:, mask, :]
     else:
         dict_2d['f2d_dan'] = get_base2d_feature(args.input, args.output)
     with torch.no_grad():
@@ -88,6 +102,7 @@ if __name__ == '__main__':
             if method == 'se3_Full':
                 dim2d = 25 + 9 * 5
                 from network.se3_model import se3_model
+
                 model = se3_model(dim2d=dim2d, dim1d=33)
                 state = torch.load('models/esto9_se3.tar', map_location=torch.device('cpu'))
                 model.load_state_dict(state['model'])
@@ -140,6 +155,6 @@ if __name__ == '__main__':
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
                 pred_lddt_all = pred_lddt_all + out / len(methods)
-            else:
-                raise NotImplementedError
-    np.save(os.path.join(args.output, os.path.basename(args.input)), pred_lddt_all.astype(np.float16))
+
+    np.save(os.path.join(args.output, os.path.basename(args.input).replace('.pdb', '')),
+            pred_lddt_all.astype(np.float16))
