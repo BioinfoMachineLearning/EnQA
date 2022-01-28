@@ -6,7 +6,7 @@ A 3D-equivariant neural network for protein structure accuracy estimation
 ```
 usage: python3 EnQA.py [-h] --input INPUT --output OUTPUT --method METHOD [--cpu] [--alphafold_prediction ALPHAFOLD_PREDICTION] [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB]
 
-Predict model quality and output numpy array format.
+Predict model quality and output NumPy array format.
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -38,13 +38,13 @@ You may also need to set execution permission for utils/lddt and files under uti
 
 ## Example usages
 
-Running on a E(n)-Equivariant model under example folder:
+Running an E(n)-equivariant model under example folder:
 
 ```
 python3 EnQA.py --input example/model/6KYTP/test_model.pdb --output outputs/ --method EGNN_Full --alphafold_prediction example/alphafold_prediction/6KYTP/
 ```
 
-If you want to run models based on [SE(3)-Transformer](https://arxiv.org/abs/2006.10503), then Python package equivariant_attention is required, and should be installed following [Fibian's implementation](https://github.com/FabianFuchsML/se3-transformer-public).
+If you want to run models based on the [SE(3)-Transformer](https://arxiv.org/abs/2006.10503), then the Python package `equivariant_attention` is required and should be installed following [Fabian's implementation](https://github.com/FabianFuchsML/se3-transformer-public).
 
 Example:
 
@@ -54,7 +54,7 @@ python3 EnQA.py --input example/model/6KYTP/test_model.pdb --output outputs/ --m
 
 ## Feature generation using featurizers from Spherical graph convolutional networks 
 
-The featurizers from Spherical graph convolutional networks (S-GCN) are used to processe 3D models of proteins represented as molecular graphs.
+The featurizers from Spherical graph convolutional networks (S-GCN) are used to process 3D models of proteins represented as molecular graphs.
 Here we provide the voronota and spherical harmonics featurizer for Linux.
 
 If you need to rebuild the voronota for a different system, please check out the [S-GCN Repo](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#voronota).
