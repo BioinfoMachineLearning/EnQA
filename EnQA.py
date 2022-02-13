@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, required=True,
                         help='Path to output folder.')
     parser.add_argument('--method', type=str, required=False, default='EGNN_Full',
-                        help='Prediction method, can be "Ensemble", "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.')
+                        help='Prediction method, can be "ensemble", "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.')
     parser.add_argument('--cpu', action='store_true', default=False, help='Force to use CPU.')
     parser.add_argument('--alphafold_prediction', type=str, required=False, default='',
                         help='Path to alphafold prediction results.')
