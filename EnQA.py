@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, required=True,
                         help='Path to output folder.')
     parser.add_argument('--method', type=str, required=False, default='EGNN_Full',
-                        help='Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.')
+                        help='Prediction method, can be "ensemble", "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.')
     parser.add_argument('--cpu', action='store_true', default=False, help='Force to use CPU.')
     parser.add_argument('--alphafold_prediction', type=str, required=False, default='',
                         help='Path to alphafold prediction results.')
@@ -34,7 +34,11 @@ if __name__ == '__main__':
         os.mkdir(args.output)
 
     # Featureize
-    methods = args.method.split(',')
+    if args.method == 'ensemble':
+        methods = ["EGNN_Full", "se3_Full", "EGNN_esto9"]
+    else:
+        methods = args.method.split(',')
+
     disto_types = []
     if 'EGNN_Full' in methods or 'se3_Full' in methods or 'EGNN_esto9' in methods:
         disto_types.append('esto9')
@@ -79,6 +83,7 @@ if __name__ == '__main__':
                 dict_2d[f2d_type] = dict_2d[f2d_type][:, :, mask][:, mask, :]
     else:
         dict_2d['f2d_dan'] = get_base2d_feature(args.input, args.output)
+
     with torch.no_grad():
         for method in methods:
             if method == 'EGNN_Full':
@@ -98,6 +103,7 @@ if __name__ == '__main__':
                 _, _, pred_lddt = model(f1d, f2d, pos, el, cmap)
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
+                out[out < 0] = 0
                 pred_lddt_all = pred_lddt_all + out / len(methods)
             if method == 'se3_Full':
                 dim2d = 25 + 9 * 5
@@ -118,6 +124,7 @@ if __name__ == '__main__':
                 _, _, pred_lddt = model(f1d, f2d, pos, el, cmap)
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
+                out[out < 0] = 0
                 pred_lddt_all = pred_lddt_all + out / len(methods)
             if method == 'EGNN_covariance':
                 dim2d = 25 + 25
@@ -136,6 +143,7 @@ if __name__ == '__main__':
                 _, _, pred_lddt = model(f1d, f2d, pos, el, cmap)
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
+                out[out < 0] = 0
                 pred_lddt_all = pred_lddt_all + out / len(methods)
             if method == 'EGNN_esto9':
                 dim2d = 25 + 45
@@ -154,6 +162,7 @@ if __name__ == '__main__':
                 _, _, pred_lddt = model(f1d, f2d, pos, el, cmap)
                 out = pred_lddt.cpu().detach().numpy().astype(np.float16)
                 out[out > 1] = 1
+                out[out < 0] = 0
                 pred_lddt_all = pred_lddt_all + out / len(methods)
 
     np.save(os.path.join(args.output, os.path.basename(args.input).replace('.pdb', '')),

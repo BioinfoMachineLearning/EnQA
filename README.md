@@ -12,7 +12,7 @@ optional arguments:
   -h, --help                  show this help message and exit
   --input INPUT               Path to input pdb file.
   --output OUTPUT             Path to output folder.
-  --method METHOD             Prediction method, can be "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.
+  --method METHOD             Prediction method, can be "ensemble", "EGNN_Full", "se3_Full", "EGNN_esto9" or "EGNN_covariance". Ensemble can be done listing multiple models separated by comma.
   --alphafold_prediction      Path to alphafold prediction results.               
   --alphafold_feature_cache   Optional. Can cache AlphaFold features for models of the same sequence.
   --af2_pdb AF2_PDB           Optional. PDBs from AlphaFold predcition for index correction with input pdb when input PDB only contains partial sequence of the AlphaFold results.
