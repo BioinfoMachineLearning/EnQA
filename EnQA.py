@@ -53,8 +53,9 @@ if __name__ == '__main__':
     input_name = os.path.basename(args.input).replace('.pdb', '')
     ppdb = PandasPdb().read_pdb(args.input)
     is_multi_chain = len(ppdb.df['ATOM']['chain_id'].unique()) > 1
+    temp_dir = args.output + '/tmp/'
+
     if is_multi_chain:
-        temp_dir = args.output + '/tmp/'
         if not os.isdir(temp_dir):
             os.mkdir(temp_dir)
         outputPDB = os.path.join(temp_dir, 'merged_'+input_name+'.pdb')
