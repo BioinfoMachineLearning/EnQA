@@ -56,7 +56,7 @@ if __name__ == '__main__':
     temp_dir = args.output + '/tmp/'
 
     if is_multi_chain:
-        if not os.isdir(temp_dir):
+        if not os.path.isdir(temp_dir):
             os.mkdir(temp_dir)
         outputPDB = os.path.join(temp_dir, 'merged_'+input_name+'.pdb')
         mergePDB(args.input, outputPDB, newStart=1)
