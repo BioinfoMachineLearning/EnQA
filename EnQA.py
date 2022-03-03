@@ -1,5 +1,6 @@
 import os
 import pickle
+import shutil
 
 import torch
 import argparse
@@ -53,7 +54,10 @@ if __name__ == '__main__':
     ppdb = PandasPdb().read_pdb(args.input)
     is_multi_chain = len(ppdb.df['ATOM']['chain_id'].unique()) > 1
     if is_multi_chain:
-        outputPDB = os.path.join(args.output, 'merged_'+input_name+'.pdb')
+        temp_dir = args.output + '/tmp/'
+        if not os.isdir(temp_dir):
+            os.mkdir(temp_dir)
+        outputPDB = os.path.join(temp_dir, 'merged_'+input_name+'.pdb')
         mergePDB(args.input, outputPDB, newStart=1)
         args.input = outputPDB
 
@@ -68,7 +72,7 @@ if __name__ == '__main__':
     dict_2d = {}
     if use_af2:
         af2_qa = process_alphafold_model(args.input, args.alphafold_prediction, lddt_cmd, n_models=5,
-                                         is_multi_chain=is_multi_chain)
+                                         is_multi_chain=is_multi_chain, temp_dir=temp_dir)
         if args.alphafold_feature_cache is not None and os.path.isfile(args.alphafold_prediction_cache):
             x = pickle.load(open(args.alphafold_prediction_cache, 'rb'))
             plddt = x['plddt']
@@ -178,4 +182,4 @@ if __name__ == '__main__':
 
     np.save(os.path.join(args.output, input_name+'.npy'), pred_lddt_all.astype(np.float16))
     if is_multi_chain:
-        os.remove(args.input)
+        shutil.rmtree(temp_dir)
