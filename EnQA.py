@@ -1,14 +1,16 @@
 import os
 import pickle
+
 import torch
 import argparse
 import numpy as np
+from biopandas.pdb import PandasPdb
 
 from data.loader import expand_sh
 from data.process_label import parse_pdbfile
-from feature import create_basic_features, get_base2d_feature
+from feature import create_basic_features, get_base2d_feature, mergePDB
 from data.process_alphafold import process_alphafold_target_ensemble, process_alphafold_model
-from network.resEGNN import resEGNN, resEGNN_with_mask, resEGNN_with_ne
+from network.resEGNN import resEGNN_with_mask, resEGNN_with_ne
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Predict model quality and output numpy array format.')
@@ -47,6 +49,14 @@ if __name__ == '__main__':
     if 'EGNN_no_AF2' in methods:
         disto_types.append('base')
 
+    input_name = os.path.basename(args.input).replace('.pdb', '')
+    ppdb = PandasPdb().read_pdb(args.input)
+    is_multi_chain = len(ppdb.df['ATOM']['chain_id'].unique()) > 1
+    if is_multi_chain:
+        outputPDB = os.path.join(args.output, 'merged_'+input_name+'.pdb')
+        mergePDB(args.input, outputPDB, newStart=1)
+        args.input = outputPDB
+
     one_hot, features, pos, sh_adj, el = create_basic_features(args.input, args.output, template_path=None,
                                                                diff_cutoff=15, coordinate_factor=0.01)
     sh_data = expand_sh(sh_adj, one_hot.shape[1])
@@ -57,7 +67,8 @@ if __name__ == '__main__':
         use_af2 = False
     dict_2d = {}
     if use_af2:
-        af2_qa = process_alphafold_model(args.input, args.alphafold_prediction, lddt_cmd, n_models=5)
+        af2_qa = process_alphafold_model(args.input, args.alphafold_prediction, lddt_cmd, n_models=5,
+                                         is_multi_chain=is_multi_chain)
         if args.alphafold_feature_cache is not None and os.path.isfile(args.alphafold_prediction_cache):
             x = pickle.load(open(args.alphafold_prediction_cache, 'rb'))
             plddt = x['plddt']
@@ -165,5 +176,6 @@ if __name__ == '__main__':
                 out[out < 0] = 0
                 pred_lddt_all = pred_lddt_all + out / len(methods)
 
-    np.save(os.path.join(args.output, os.path.basename(args.input).replace('.pdb', '')),
-            pred_lddt_all.astype(np.float16))
+    np.save(os.path.join(args.output, input_name+'.npy'), pred_lddt_all.astype(np.float16))
+    if is_multi_chain:
+        os.remove(args.input)

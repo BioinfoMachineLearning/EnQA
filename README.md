@@ -35,6 +35,8 @@ torch==1.10.0
 
 [equivariant_attention](https://github.com/FabianFuchsML/se3-transformer-public) (Optional, used by models based on SE(3)-Transformer only)
 
+[pdb-tools](https://github.com/haddocking/pdb-tools) (Optional, used by models with multiple chains only)
+
 You may also need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
 
 ## Example usages
@@ -77,4 +79,5 @@ pip install git+https://github.com/AMLab-Amsterdam/lie_learn
 git clone https://github.com/FabianFuchsML/se3-transformer-public.git
 cd se3-transformer-public
 pip install -e .
+pip install pdb-tools
 ```

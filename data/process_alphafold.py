@@ -6,14 +6,20 @@ from scipy.special import softmax
 from scipy.spatial.distance import pdist, squareform
 
 from data.process_label import generate_lddt_score, parse_pdbfile, get_coords_ca
+from feature import mergePDB
 
-
-def process_alphafold_model(input_model_path, alphafold_prediction_path, lddt_cmd, n_models=5):
+def process_alphafold_model(input_model_path, alphafold_prediction_path, lddt_cmd, n_models=5, is_multi_chain=False):
     lddt_list = []
     all_af2_pred_models = ['relaxed_model_' + str(i + 1) + '.pdb' for i in range(n_models)]
     for i in all_af2_pred_models:
         af2_pred_model = os.path.join(alphafold_prediction_path, i)
-        lddt_af2 = generate_lddt_score(input_model_path, af2_pred_model, lddt_cmd)
+        if is_multi_chain:
+            af2_merged = os.path.join(alphafold_prediction_path, 'merged_' + i)
+            mergePDB(af2_pred_model, af2_merged)
+            lddt_af2 = generate_lddt_score(input_model_path, af2_merged, lddt_cmd)
+            os.remove(af2_merged)
+        else:
+            lddt_af2 = generate_lddt_score(input_model_path, af2_pred_model, lddt_cmd)
         lddt_list.append(lddt_af2)
     assert len(lddt_list) == n_models
     af2_qa = np.vstack(lddt_list)
