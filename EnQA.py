@@ -8,8 +8,8 @@ from biopandas.pdb import PandasPdb
 
 from data.loader import expand_sh
 from data.process_label import parse_pdbfile
-from feature import create_basic_features, get_base2d_feature, mergePDB
-from data.process_alphafold import process_alphafold_target_ensemble, process_alphafold_model
+from feature import create_basic_features, get_base2d_feature
+from data.process_alphafold import process_alphafold_target_ensemble, process_alphafold_model, mergePDB
 from network.resEGNN import resEGNN_with_mask, resEGNN_with_ne
 
 if __name__ == '__main__':

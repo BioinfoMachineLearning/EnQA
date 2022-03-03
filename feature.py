@@ -1,5 +1,4 @@
 import os
-import re
 import numpy as np
 import pandas as pd
 import shutil
@@ -330,19 +329,3 @@ def create_train_dataset(input_model_path, output_feature_model_path, output_fea
                                                            input_pdb_file=input_model_path)
             np.savez(output_feature_target_file, disto_feature=af2_2d, plddt=plddt, cmap=cmap)
 
-
-def mergePDB(inputPDB, outputPDB, newStart=1):
-    with open(inputPDB, 'r') as f:
-        x = f.readlines()
-    filtered = [i for i in x if re.match(r'^ATOM.+',i)]
-    chains = set([i[21] for i in x if re.match(r'^ATOM.+',i)])
-    chains = list(chains)
-    chains.sort()
-    with open(outputPDB+'.tmp', 'w') as f:
-        f.writelines(filtered)
-    merge_cmd = 'pdb_selchain -{} {} | pdb_chain -A | pdb_reres -{} > {}'.format(','.join(chains),
-                                                                                outputPDB+'.tmp',
-                                                                                 newStart,
-                                                                                outputPDB)
-    subprocess.run(args=merge_cmd, shell=True)
-    os.remove(outputPDB+'.tmp')

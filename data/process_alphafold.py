@@ -1,12 +1,14 @@
 import os
+import re
 import pickle
+import subprocess
 
 import numpy as np
 from scipy.special import softmax
 from scipy.spatial.distance import pdist, squareform
 
 from data.process_label import generate_lddt_score, parse_pdbfile, get_coords_ca
-from feature import mergePDB
+
 
 def process_alphafold_model(input_model_path, alphafold_prediction_path, lddt_cmd, n_models=5, is_multi_chain=False):
     lddt_list = []
@@ -132,6 +134,23 @@ def process_alphafold_target_ensemble(alphafold_prediction_path, disto_types, n_
         af2_2d_dict['esto9'] = af2_2d.astype(np.float32)
     # shape: plddt (n_models, L) cmap(L,L) af2_2d (c, L, L)
     return plddt.astype(np.float32), cmap.astype(np.float32), af2_2d_dict
+
+
+def mergePDB(inputPDB, outputPDB, newStart=1):
+    with open(inputPDB, 'r') as f:
+        x = f.readlines()
+    filtered = [i for i in x if re.match(r'^ATOM.+', i)]
+    chains = set([i[21] for i in x if re.match(r'^ATOM.+', i)])
+    chains = list(chains)
+    chains.sort()
+    with open(outputPDB + '.tmp', 'w') as f:
+        f.writelines(filtered)
+    merge_cmd = 'pdb_selchain -{} {} | pdb_chain -A | pdb_reres -{} > {}'.format(','.join(chains),
+                                                                                 outputPDB + '.tmp',
+                                                                                 newStart,
+                                                                                 outputPDB)
+    subprocess.run(args=merge_cmd, shell=True)
+    os.remove(outputPDB + '.tmp')
 
 
 if __name__ == '__main__':
