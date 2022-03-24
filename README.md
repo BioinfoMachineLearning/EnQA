@@ -39,6 +39,8 @@ torch==1.10.0
 
 You may also need to set execution permission for utils/lddt and files under utils/SGCN/bin. 
 
+Note: Currently, the dependencies support AMD/Intel based system with Ubuntu 21.10 (Impish Indri). Other Linux-based system may be also supported but not guaranteed.
+
 ## Example usages
 
 Running on a E(n)-Equivariant model under example folder:
@@ -69,15 +71,4 @@ Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#s
 
 For generating models using AlphaFold2, an installation of AlphaFold2 following its [Official Repo](https://github.com/deepmind/alphafold) is required. For our experiments, we use its original model used at CASP14 with no ensembling (--model_preset=monomer), with all genetic databases used at CASP14 (--db_preset=full_dbs), and restricts templates only to structures that were available at the start of CASP14 (--max_template_date=2020-05-14).
 
-## Quick configuration
 
-```
-pip install biopandas biopython scipy torch==1.10.1
-pip install dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
-pip install packaging wandb line_profiler
-pip install git+https://github.com/AMLab-Amsterdam/lie_learn
-git clone https://github.com/FabianFuchsML/se3-transformer-public.git
-cd se3-transformer-public
-pip install -e .
-pip install pdb-tools
-```
