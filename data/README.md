@@ -4,7 +4,7 @@
 
  [Experimental validated PDBs](https://drive.google.com/file/d/1H7AI2cYqP5nZYhmNJULxuzrODh6elrYz/view?usp=sharing)
 
- AlphaFold2 predicted PDBs are not included since the representatations are extremely large (can be over ~1GB for a single sequence) and can be regenerated using the follwing command by [AlphaFold2](https://github.com/deepmind/alphafold):
+ AlphaFold2 predicted PDBs are not included since the representatations are extremely large (can be over ~1GB for a single sequence) and final PDB outputs are not sufficient for training. To generat the required data for training, we provide the fasta sequence for our training data and they can be used as input with the follwing command by [AlphaFold2](https://github.com/deepmind/alphafold):
  
  ```
  python3 docker/run_docker.py \
@@ -15,4 +15,4 @@
   --data_dir=$DOWNLOAD_DIR
  ```
  
-There are 5 models generated for each target, the filename format is [Target ID].relaxed_model_[1-5].pdb 
+We use 5 models generated for each target, the filename format is [Target ID].relaxed_model_[1-5].pdb 
