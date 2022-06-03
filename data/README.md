@@ -24,7 +24,7 @@ python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb exampl
 Code in train.py now provides a basic framework to train the EGNN_full model with Pytorch, After all feature files for training and validation are generated, suppose the processed features files(in .pt format) are saved in path/to/train/ and path/to/validation/, here is an example to train the model:
 
 ```
-python3 train.py --train path/to/train/ --validation path/to/validation --output outputs/ --epochs 60
+python3 train.py --train path/to/train/ --validation path/to/validation/ --output outputs/ --epochs 60
 ```
 
 The training script can be modified to include the callbacks, logging and monitoring for the training procedure fit for user’s environment. Note that while EnQA can be called on PDBs with multiple chains, the training was performed in monomer datasets, and support for complexes would be added in the future.
