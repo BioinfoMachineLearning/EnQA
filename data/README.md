@@ -15,13 +15,13 @@ To generate the required data for training, we provide the [fasta format sequenc
 
 We also provide the [native PDBs](https://drive.google.com/file/d/1H7AI2cYqP5nZYhmNJULxuzrODh6elrYz/view?usp=sharing) which are required for generating the labels.
 
-To generate the labels and features when you have the predicted results from AlphaFold and the corresponding native PDBs, using the following procedure:
+To generate the labels and features when you have the predicted results from AlphaFold and the corresponding native PDBs, run [process.py](https://github.com/BioinfoMachineLearning/EnQA/blob/main/process.py) with the following command:
 
 ```
 python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/label/6KYTP.pdb --output outputs/processed --alphafold_prediction example/alphafold_prediction/6KYTP/
 ```
 
-Code in train.py now provides a basic framework to train the EGNN_full model with Pytorch, After all feature files for training and validation are generated, suppose the processed features files(in .pt format) are saved in path/to/train/ and path/to/validation/, here is an example to train the model:
+Code in [train.py](https://github.com/BioinfoMachineLearning/EnQA/blob/main/train.py) now provides a basic framework to train the EGNN_full model with Pytorch, After all feature files for training and validation are generated, suppose the processed features files(in .pt format) are saved in path/to/train/ and path/to/validation/, here is an example to train the model:
 
 ```
 python3 train.py --train path/to/train/ --validation path/to/validation/ --output outputs/ --epochs 60
