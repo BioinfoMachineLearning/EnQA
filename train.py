@@ -39,7 +39,7 @@ if __name__ == '__main__':
     for i in range(args.epochs):
         train_loss_sum = 0
         total_size = 0
-
+        model.train()
         for sample in os.listdir(args.train):
             if not sample.endswith('.pt'):
                 continue
@@ -62,21 +62,22 @@ if __name__ == '__main__':
             loss_dist = F.mse_loss(torch.nn.functional.pdist(pred_pos),
                                    torch.nn.functional.pdist(pos_transformed))
             total_loss = args.w_dist * loss_dist + args.w_bin * loss_bin + args.w_score * loss_score
-            train_loss_sum += total_loss.detach().cpu()
+            train_loss_sum += total_loss.detach().cpu().tolist()
             total_size += 1
             if total_size % args.batch_size == 0:
                 optimizer.zero_grad()
                 total_loss.backward()
                 optimizer.step()
 
-        print("Epoch: " + str(i) + ' Train loss: ' + str(train_loss_sum/total_size))
+        print("Epoch: {0:3d} Train loss: {1:0.4f}".format(i, train_loss_sum / total_size))
 
+        val_loss_sum = 0
+        total_size = 0
+        model.eval()
         for sample in os.listdir(args.validation):
             if not sample.endswith('.pt'):
                 continue
 
-            val_loss_sum = 0
-            total_size = 0
             x = torch.load(args.validation + '/' + sample)
             f1d = x['f1d'].to(device)
             f2d = x['f2d'].to(device)
@@ -87,8 +88,8 @@ if __name__ == '__main__':
             label_lddt = x['label_lddt'].to(device)
             diff_bins = x['diff_bins'].to(device)
             pos_transformed = x['pos_transformed'].to(device)
-
-            pred_bin, pred_pos, pred_lddt = model(f1d, f2d, pos, el, cmap)
+            with torch.no_grad():
+                pred_bin, pred_pos, pred_lddt = model(f1d, f2d, pos, el, cmap)
 
             loss_score = F.smooth_l1_loss(pred_lddt, label_lddt)
             loss_bin = F.cross_entropy(pred_bin, diff_bins)
@@ -99,8 +100,7 @@ if __name__ == '__main__':
             val_loss_sum += total_loss.detach().cpu()
             total_size += 1
 
-        print("Epoch: " + str(i) + ' Validation loss: ' + str(val_loss_sum/total_size))
-
+        print("Epoch: {0:3d} Validation loss: {1:0.4f}".format(i, val_loss_sum / total_size))
 
     torch.save(model.state_dict(), os.path.join(args.output, 'model_weights.pth'))
 
