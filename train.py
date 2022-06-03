@@ -69,7 +69,7 @@ if __name__ == '__main__':
                 total_loss.backward()
                 optimizer.step()
 
-        print("Epoch: {0:3d} Train loss: {1:0.4f}".format(i, train_loss_sum / total_size))
+        print("Epoch: {} Train loss: {:.4f}".format(i, train_loss_sum / total_size))
 
         val_loss_sum = 0
         total_size = 0
@@ -100,7 +100,7 @@ if __name__ == '__main__':
             val_loss_sum += total_loss.detach().cpu()
             total_size += 1
 
-        print("Epoch: {0:3d} Validation loss: {1:0.4f}".format(i, val_loss_sum / total_size))
+        print("Epoch: {} Validation loss: {:.4f}".format(i, val_loss_sum / total_size))
 
     torch.save(model.state_dict(), os.path.join(args.output, 'model_weights.pth'))
 
