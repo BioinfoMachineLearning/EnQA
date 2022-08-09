@@ -30,9 +30,9 @@ def load_x(file, normalize_x):
     features = compressed_x[['volume', 'buriedness', 'sasa']].values.astype(np.float32)
     residue_type_to_id = get_residue_type_to_id(params_dict['meta_atom_types'])
     if normalize_x:
-        features_to_normalize = features[:, X_NORM_IDX]
-        normalizations = 1 / features_to_normalize.sum(axis=0)
-        normalized_features = np.einsum('ij,j->ij', features_to_normalize, normalizations)
+        features_to_normalize = features[:, X_NORM_IDX] # volume and sasa
+        normalizations = 1 / features_to_normalize.sum(axis=0) # 1 / sum of volume,  1 / sum of sasa
+        normalized_features = np.einsum('ij,j->ij', features_to_normalize, normalizations) # features_to_normalize * normalizations
         features[:, X_NORM_IDX] = normalized_features
     one_hot = np.zeros((len(residue_types), len(residue_type_to_id)))
     for i, residue_type in enumerate(residue_types):

@@ -8,12 +8,13 @@ from scipy.special import softmax
 from scipy.spatial.distance import pdist, squareform
 
 from data.process_label import generate_lddt_score, parse_pdbfile, get_coords_ca
+from data.process_label import parse_pdbfile 
 
 
 def process_alphafold_model(input_model_path, alphafold_prediction_path, lddt_cmd, n_models=5,
                             is_multi_chain=False, temp_dir=None):
     lddt_list = []
-    all_af2_pred_models = ['relaxed_model_' + str(i + 1) + '.pdb' for i in range(n_models)]
+    all_af2_pred_models = ['relaxed_model_' + str(i + 1) + '.pdb' for i in range(n_models)] # name of strcutures
     for i in all_af2_pred_models:
         af2_pred_model = os.path.join(alphafold_prediction_path, i)
         if is_multi_chain:
@@ -27,6 +28,18 @@ def process_alphafold_model(input_model_path, alphafold_prediction_path, lddt_cm
     af2_qa = np.vstack(lddt_list)
     # shape (n_models, L)
     return af2_qa.astype(np.float32)
+
+def process_without_af_model(input_model_path, n_models=5, num_bin = 9, is_multi_chain=False, temp_dir=None):
+    dict_2d = {}
+    pose_input = parse_pdbfile(input_model_path)
+    number_of_aa = len(pose_input)
+    af2_qa = np.array([[0] * number_of_aa] * n_models, dtype=np.float32)
+    plddt = np.array([[0] * number_of_aa] * n_models, dtype=np.float32)
+    cmap = np.array([[1] * number_of_aa] * number_of_aa, dtype=np.float32)
+    dict_2d['esto9'] = np.array([[[0] * number_of_aa] * number_of_aa] * (num_bin * n_models), dtype=np.float32)
+    return af2_qa, plddt, cmap, dict_2d
+
+
 
 
 def compute_esto9_single(input_pdb_file, af2_result_file,
