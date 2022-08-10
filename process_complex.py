@@ -15,7 +15,7 @@ def process_complex(
     """
     Run process.py for each structure.
     @param input_path: path to input pdb files
-    @param sample: txt file with structure ids for training
+    @param sample: txt file with structure ids for training 
     @param reference_name: name of reference structure
     @param prediction_name: name of predicted structure
     @param output: path to output folder
@@ -31,8 +31,8 @@ def process_complex(
         logging.info(f"Process for {_id} is starting... Reference structure: {ref_path}, Predicted structure: {pred_path}")
         try:
             process(
-            input_str=str(ref_path), 
-            output_str=output,
+            input_pdb=str(ref_path), 
+            output_path=output,
             label_pdb=str(pred_path), 
             name=_id
             )
