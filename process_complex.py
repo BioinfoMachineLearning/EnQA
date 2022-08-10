@@ -9,9 +9,7 @@ from process import process
 def process_complex(input_path: Path, sample: str, reference_name: str='real_joined.pdb',
                     prediction_name: str='docked_joined.pdb', output: str='outputs/processed') -> None:
     """
-    Generate the labels and features for training
-    without the predicted results from AlphaFold and with the corresponding native PDBs.
-    The labels and features will be written to .pt file.
+    Run process.py for each structure.
     @param input_path: path to input pdb files
     @param sample: txt file with structure ids for training
     @param reference_name: name of reference structure
