@@ -6,8 +6,12 @@ from tqdm import tqdm
 
 from process import process
 
-def process_complex(input_path: Path, sample: str, reference_name: str='real_joined.pdb',
-                    prediction_name: str='docked_joined.pdb', output: str='outputs/processed') -> None:
+def process_complex(
+    input_path: Path, 
+    sample: str, 
+    reference_name: str='real_joined.pdb',
+    prediction_name: str='docked_joined.pdb', output: str='outputs/processed'
+) -> None:
     """
     Run process.py for each structure.
     @param input_path: path to input pdb files
@@ -95,7 +99,6 @@ if __name__ == '__main__':
   
  
 
-# python3 process_complex.py --input '/mnt/volume_complex_lddt/consistent/' --sample 'train.txt'
-
+# python3 process_complex.py --input /mnt/volume_complex_lddt/consistent/ --sample train.txt --reference_name real.pdb --prediction_name docked.pdb --output outputs/processed
 # python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/model/6KYTP/test_model.pdb --output outputs/processed
 
