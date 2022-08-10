@@ -34,7 +34,7 @@ def process_complex(
             input_pdb=str(ref_path), 
             output_path=output,
             label_pdb=str(pred_path), 
-            name=_id
+            input_name=_id
             )
             logging.info(f"Process {_id} done.")
         except Exception as e:
