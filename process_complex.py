@@ -31,9 +31,9 @@ def process_complex(
         logging.info(f"Process for {_id} is starting... Reference structure: {ref_path}, Predicted structure: {pred_path}")
         try:
             process(
-            input_pdb=str(ref_path), 
+            input_pdb=str(pred_path), 
             output_path=output,
-            label_pdb=str(pred_path), 
+            label_pdb=str(ref_path), 
             input_name=_id
             )
             logging.info(f"Process {_id} done.")
@@ -99,6 +99,6 @@ if __name__ == '__main__':
   
  
 
-# python3 process_complex.py --input /mnt/volume_complex_lddt/consistent/ --sample train.txt --reference_name real.pdb --prediction_name docked.pdb --output outputs/processed
+# python3 process_complex.py --input /mnt/volume_complex_lddt/consistent/ --sample train.txt --reference_name real_joined.pdb --prediction_name docked_joined.pdb --output outputs/processed
 # python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/model/6KYTP/test_model.pdb --output outputs/processed
 
