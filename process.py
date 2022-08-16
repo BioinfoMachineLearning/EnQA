@@ -92,15 +92,38 @@ def process(
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Predict model quality and output numpy array format.')
-    parser.add_argument('--input', type=str, required=True,
-                        help='Path to input pdb file.')
-    parser.add_argument('--output', type=str, required=True,
-                        help='Path to output folder.')
-    parser.add_argument('--alphafold_prediction', type=str, required=False, default='',
-                        help='Path to alphafold prediction results.') # required has been changed to False
-    parser.add_argument('--label_pdb', type=str, required=True, default='')
-    parser.add_argument('--name', type=str, required=False, default='',
-                        help='Structure name.')
+    parser.add_argument(
+        '--input', 
+        type=str, 
+        required=True,
+        help='Path to input pdb file.'
+    )
+    parser.add_argument(
+        '--output',
+        type=str, 
+        required=True,
+        help='Path to output folder.'
+    )
+    parser.add_argument(
+        '--alphafold_prediction', 
+        type=str, 
+        required=False, 
+        default='',
+        help='Path to alphafold prediction results.'
+    ) # required has been changed to False
+    parser.add_argument(
+        '--label_pdb', 
+        type=str, 
+        required=True, 
+        default=''
+    )
+    parser.add_argument(
+        '--name', 
+        type=str, 
+        required=False, 
+        default='',
+        help='Structure name.'
+    )
     args = parser.parse_args()
     process(input_str=args.input, output_str=args.output, alphafold_prediction=args.alphafold_prediction, label_pdb=args.label_pdb)
 
