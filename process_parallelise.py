@@ -36,12 +36,12 @@ def run_oneq_task(type_sample: str, n_tasks: int) -> None:
     @param n_tasks: number of tasks
     @return: None
     """
-    # folder = f"oneq_tasks_{type_sample}"
-    # for _ind in range(n_tasks):
-    #     filename = f"{type_sample}_{_ind}.txt"
-    #     path_to_file = f"{folder}/{filename}"
-    #     output_folder = f"outputs_{_ind}/processed"
-    #     os.system(f"{ONEQ_TASK.format(PATH_TO_MODEL, path_to_file, output_folder)}")
+    folder = f"oneq_tasks_{type_sample}"
+    for _ind in range(n_tasks):
+        filename = f"{type_sample}_{_ind}.txt"
+        path_to_file = f"{folder}/{filename}"
+        output_folder = f"outputs_{type_sample}_{_ind}/processed"
+        os.system(f"{ONEQ_TASK.format(PATH_TO_MODEL, path_to_file, output_folder)}")
   
 
 def run_oneq_tasks(sample: str, n_tasks: int, type_sample: str='train') -> None:
@@ -56,7 +56,7 @@ def run_oneq_tasks(sample: str, n_tasks: int, type_sample: str='train') -> None:
         structure_id = f.read().splitlines()
     array_id = np.array_split(structure_id, n_tasks)
     write_to_files(array_id, type_sample)
-    run_oneq_task(type_sample, n_tasks)
+    # run_oneq_task(type_sample, n_tasks)
 
 
 
