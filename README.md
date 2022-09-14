@@ -21,7 +21,7 @@ optional arguments:
 ```
 
 ## Requirements:
-biopandas==0.2.9
+biopandas==0.3.0dev0
 
 biopython==1.79
 
@@ -71,4 +71,17 @@ Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#s
 
 For generating models using AlphaFold2, an installation of AlphaFold2 following its [Official Repo](https://github.com/deepmind/alphafold) is required. For our experiments, we use its original model used at CASP14 with no ensembling (--model_preset=monomer), with all genetic databases used at CASP14 (--db_preset=full_dbs), and restricts templates only to structures that were available at the start of CASP14 (--max_template_date=2020-05-14).
 
+## EnQA-MSA
+
+Install Protein translation model by the following command:
+```
+pip install git+https://github.com/facebookresearch/esm.git
+```
+
+Provide input PDB from AlphaFold2 prediction with plddt stored in the "B-factor" column.
+Example:
+
+```
+python EnQA-MSA.py  --input example/enqa-msa/1A09A.pdb --output  example/output/
+```
 
