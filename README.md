@@ -83,6 +83,6 @@ Provide input PDB from AlphaFold2 prediction with plddt stored in the "B-factor"
 Example:
 
 ```
-python EnQA-MSA.py  --input example/enqa-msa/1A09A.pdb --output  example/output/
+python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
 ```
 
