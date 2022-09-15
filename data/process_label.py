@@ -16,15 +16,15 @@ def parse_pdbfile(pdbfile):
     output = {}
     for line in lines:
         if line[13] != "H":
-            aidx = int(line[6:11])
-            aname = line[12:16].strip()
-            rname = line[17:20].strip()
-            cname = line[21].strip()
-            rindex = int(line[22:26])
-            xcoord = float(line[30:38])
-            ycoord = float(line[38:46])
-            zcoord = float(line[46:54])
-            occupancy = float(line[54:60])
+            aidx = int(line[6:11]) # Atom serial number
+            aname = line[12:16].strip() # Atom name
+            rname = line[17:20].strip() #  Residue name
+            cname = line[21].strip() # Chain identifier
+            rindex = int(line[22:26]) # Residue sequence number
+            xcoord = float(line[30:38]) # Orthogonal coordinates for X in Angstroms
+            ycoord = float(line[38:46]) # Orthogonal coordinates for Y in Angstroms
+            zcoord = float(line[46:54]) # Orthogonal coordinates for Z in Angstroms
+            occupancy = float(line[54:60]) # Occupancy
 
             temp = dict(aidx=aidx,
                         aname=aname,
@@ -36,6 +36,7 @@ def parse_pdbfile(pdbfile):
                         z=zcoord,
                         occupancy=occupancy)
 
+            # all information of each residue
             residue = output.get(rindex, {})
             residue[aname] = temp
             output[rindex] = residue
@@ -46,6 +47,7 @@ def parse_pdbfile(pdbfile):
     for k in keys:
         temp = output[k]
         temp["rindex"] = k
+        print(k, temp)
         temp["rname"] = temp["CA"]["rname"]
         output2.append(temp)
 
