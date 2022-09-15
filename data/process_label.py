@@ -47,7 +47,6 @@ def parse_pdbfile(pdbfile):
     for k in keys:
         temp = output[k]
         temp["rindex"] = k
-        print(k, temp)
         temp["rname"] = temp["CA"]["rname"]
         output2.append(temp)
 
