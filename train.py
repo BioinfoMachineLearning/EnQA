@@ -4,6 +4,7 @@ import argparse
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+from tqdm import tqdm
 
 from network.resEGNN import resEGNN_with_ne
 
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         train_loss_sum = 0
         total_size = 0
         model.train()
-        for sample in os.listdir(args.train):
+        for sample in tqdm(os.listdir(args.train)):
             if not sample.endswith('.pt'):
                 continue
 
@@ -56,6 +57,7 @@ if __name__ == '__main__':
             pos_transformed = x['pos_transformed'].to(device)
 
             pred_bin, pred_pos, pred_lddt = model(f1d, f2d, pos, el, cmap)
+    
 
             loss_score = F.smooth_l1_loss(pred_lddt, label_lddt)
             loss_bin = F.cross_entropy(pred_bin, diff_bins)
@@ -84,12 +86,14 @@ if __name__ == '__main__':
             pos = x['pos'].to(device)
             el = [i.to(device) for i in x['el']]
             cmap = x['cmap'].to(device)
+        
 
             label_lddt = x['label_lddt'].to(device)
             diff_bins = x['diff_bins'].to(device)
             pos_transformed = x['pos_transformed'].to(device)
             with torch.no_grad():
                 pred_bin, pred_pos, pred_lddt = model(f1d, f2d, pos, el, cmap)
+           
 
             loss_score = F.smooth_l1_loss(pred_lddt, label_lddt)
             loss_bin = F.cross_entropy(pred_bin, diff_bins)
