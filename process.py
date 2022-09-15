@@ -87,9 +87,6 @@ def process(
                os.path.join(output_path, input_name + '.pt'))
    
 
-# python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/model/6KYTP/test_model.pdb --output outputs/processed --alphafold_prediction example/alphafold_prediction/6KYTP/
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Predict model quality and output numpy array format.')
     parser.add_argument(
@@ -125,5 +122,7 @@ if __name__ == '__main__':
         help='Structure name.'
     )
     args = parser.parse_args()
-    process(input_str=args.input, output_str=args.output, alphafold_prediction=args.alphafold_prediction, label_pdb=args.label_pdb)
+    process(input_pdb=args.input, output_path=args.output, alphafold_prediction=args.alphafold_prediction, label_pdb=args.label_pdb)
 
+
+# python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/model/6KYTP/test_model.pdb --output outputs/processed --alphafold_prediction example/alphafold_prediction/6KYTP/
