@@ -73,7 +73,7 @@ For generating models using AlphaFold2, an installation of AlphaFold2 following 
 
 ## EnQA-MSA
 
-Install [Transformer protein language models from Facebook AI Research](https://github.com/facebookresearch/esm) by the following command:
+In addition to the requirements of EnQA, install [Transformer protein language models from Facebook AI Research](https://github.com/facebookresearch/esm) by the following command:
 
 ```
 pip install git+https://github.com/facebookresearch/esm.git
