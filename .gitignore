@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# mypy
+.mypy_cache/
+mypy-report
+
+# VS Code project settings
+.vscode
+
+# pytest
+.pytest_cache
+
+# other files
+error.txt
+poetry-env
+*.DS_Store

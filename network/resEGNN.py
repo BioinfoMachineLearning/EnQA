@@ -282,11 +282,12 @@ class resEGNN_with_ne(torch.nn.Module):
         bin_prediction = (bin_prediction + bin_prediction.permute(0, 1, 3, 2)) / 2
         estogram_prediction = F.softmax(bin_prediction, dim=1)
         lddt_prediction = self.calculate_LDDT(estogram_prediction.squeeze(), cmap.squeeze())
+        lddt_prediction=torch.zeros_like(lddt_prediction)
         edge_features = torch.cat([out_base_resnet, bin_prediction], dim=1)
         edge_features = edge_features[0, :, el[0], el[1]].transpose(0, 1)
         node_features = torch.cat((out_conv1d_1.permute(0, 2, 1).squeeze(), lddt_prediction.unsqueeze(1)), dim=1)
         node_features, pos_new = self._modules["EGNN_layers"](node_features, pos, el, edge_features)
-        lddt_prediction_final = lddt_prediction + torch.tanh(node_features.squeeze())
+        lddt_prediction_final = lddt_prediction + torch.sigmoid(node_features.squeeze())
         return bin_prediction, pos_new, lddt_prediction_final
 
 
