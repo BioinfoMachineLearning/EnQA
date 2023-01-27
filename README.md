@@ -1,7 +1,7 @@
 # EnQA
 
 A 3D-equivariant neural network for protein structure accuracy estimation
-
+Plese
 
 ```
 usage: python3 EnQA.py [-h] --input INPUT --output OUTPUT --method METHOD [--cpu] [--alphafold_prediction ALPHAFOLD_PREDICTION] [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB]
@@ -85,4 +85,5 @@ Example:
 ```
 python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
 ```
-
+## Reference
+[Chen C, Chen X, Morehead A, Wu T, Cheng J. 3D-equivariant graph neural networks for protein model quality assessment. Bioinformatics. 2023 Jan 13:btad030. doi: 10.1093/bioinformatics/btad030.](https://pubmed.ncbi.nlm.nih.gov/36637199/)
