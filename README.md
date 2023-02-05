@@ -85,5 +85,25 @@ Example:
 ```
 python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
 ```
+
+## PDB with Multiple Chains
+For EnQA-MSA, you can preprocess the input PDB with the [mergePDB](https://github.com/BioinfoMachineLearning/EnQA/blob/25c1142fa8936ebb843db79a51161cdee499697a/data/process_alphafold.py#L139) function we provided to convert it into a "merged single chain PDB" and make that as the input PDB.
+
+## EnQA-MSA Model Training
+
+We provide script for feature generation and model training code.
+First, generate feature files and embeddings from MSA-Transformer. Example for [data_list_file](https://github.com/BioinfoMachineLearning/EnQA/blob/main/data/af2_train.txt) which contains list for models.
+
+```
+python3 generate_data.py <input pdb folder> <reference pdb folder> <feature save folder> <data_list_file> 
+python3 generate_embedding.py <reference pdb folder> <embedding save folder>
+```
+
+After all feature files are generated,  here is how to train the model:
+```
+python3 train_enqa_msa.py --core_data <feature save folder> --attn <embedding save folder> --train <data_list_file for training> --validation <data_list_file for validation> --output <model_save_folder> --epochs 60
+```
+
+
 ## Reference
 [Chen C, Chen X, Morehead A, Wu T, Cheng J. 3D-equivariant graph neural networks for protein model quality assessment. Bioinformatics. 2023 Jan 13:btad030. doi: 10.1093/bioinformatics/btad030.](https://pubmed.ncbi.nlm.nih.gov/36637199/)
