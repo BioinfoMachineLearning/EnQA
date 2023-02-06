@@ -101,8 +101,8 @@ For generating models using AlphaFold2, an installation of AlphaFold2 following 
 
 
 ### Model training for EnQA assisted with AlphaFold2
-First generate 5 AlphaFold reference models 
-To generate the labels and features when you have the predicted results from AlphaFold and the corresponding native PDBs, using the following procedure:
+First generate 5 AlphaFold reference models per [Generating AlphaFold2 models for assisted quality assessment](https://github.com/BioinfoMachineLearning/EnQA#generating-alphafold2-models-for-assisted-quality-assessment).
+Then generate the labels and features after you have the predicted results from AlphaFold and the corresponding native PDBs:
 ```
 python3 process.py --input example/model/6KYTP/test_model.pdb --label_pdb example/label/6KYTP.pdb --output outputs/processed --alphafold_prediction example/alphafold_prediction/6KYTP/
  ```
