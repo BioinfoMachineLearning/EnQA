@@ -11,6 +11,11 @@ pandas==1.3.4
 scipy==1.7.1
 torch==1.10.0
 ```
+Install [Transformer protein language models](https://github.com/facebookresearch/esm) by the following command:
+
+```
+pip install git+https://github.com/facebookresearch/esm.git
+```
 
 [equivariant_attention](https://github.com/FabianFuchsML/se3-transformer-public) (Optional, used by models based on SE(3)-Transformer only)
 
@@ -20,11 +25,7 @@ You may also need to set execution permission for utils/lddt and files under uti
 
 Note: Currently, the dependencies support AMD/Intel based system with Ubuntu 21.10 (Impish Indri). Other Linux-based system may be also supported but not guaranteed.
 
-Install [Transformer protein language models](https://github.com/facebookresearch/esm) by the following command:
 
-```
-pip install git+https://github.com/facebookresearch/esm.git
-```
 
 ## EnQA-MSA
 
