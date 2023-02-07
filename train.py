@@ -35,15 +35,13 @@ if __name__ == '__main__':
     model = resEGNN_with_ne(dim2d=dim2d, dim1d=33)
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.wd)
+    train_list = [s for s in os.listdir(args.train) if s.endswith('.pt')]
 
     for i in range(args.epochs):
         train_loss_sum = 0
         total_size = 0
         model.train()
-        for sample in os.listdir(args.train):
-            if not sample.endswith('.pt'):
-                continue
-
+        for sample in train_list:
             x = torch.load(args.train + '/' + sample)
             f1d = x['f1d'].to(device)
             f2d = x['f2d'].to(device)
@@ -64,7 +62,7 @@ if __name__ == '__main__':
             total_loss = args.w_dist * loss_dist + args.w_bin * loss_bin + args.w_score * loss_score
             train_loss_sum += total_loss.detach().cpu().tolist()
             total_size += 1
-            if total_size % args.batch_size == 0:
+            if total_size % args.batch_size == 0 or total_size == len(train_list):
                 optimizer.zero_grad()
                 total_loss.backward()
                 optimizer.step()
