@@ -50,13 +50,15 @@ python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
 First, generate feature files and embeddings from MSA-Transformer. Example for [data_list_file](https://github.com/BioinfoMachineLearning/EnQA/blob/main/data/af2_train.txt) which contains list for models.
 
 ```
-python3 generate_data.py <input pdb folder> <reference pdb folder> <feature save folder> <data_list_file> 
-python3 generate_embedding.py <reference pdb folder> <embedding save folder>
+# PDBs in <input_pdb_folder> <reference_pdb_folder> should have same file name for same target.
+
+python3 generate_data.py <input_pdb_folder> <reference_pdb_folder> <feature_save_folder> <data_list_file> 
+python3 generate_embedding.py <reference_pdb_folder> <embedding_save_folder>
 ```
 
 After all feature files are generated,  here is how to train the model:
 ```
-python3 train_enqa_msa.py --core_data <feature save folder> --attn <embedding save folder> --train <data_list_file for training> --validation <data_list_file for validation> --output <model_save_folder> --epochs 60
+python3 train_enqa_msa.py --core_data <feature_save_folder> --attn <embedding_save_folder> --train <data_list_file for training> --validation <data_list_file for validation> --output <model_save_folder> --epochs 60
 ```
 
 
