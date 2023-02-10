@@ -50,7 +50,7 @@ python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
 First, generate feature files and embeddings from MSA-Transformer. Example for [data_list_file](https://github.com/BioinfoMachineLearning/EnQA/blob/main/data/af2_train.txt) which contains list for models.
 
 ```
-# PDBs in <input_pdb_folder> <reference_pdb_folder> should have same file name for same target.
+# PDBs in <input_pdb_folder> and <reference_pdb_folder> should have same file name for the same target, for example: path/to/input/test.pdb and path/to/ref/test.pdb
 
 python3 generate_data.py <input_pdb_folder> <reference_pdb_folder> <feature_save_folder> <data_list_file> 
 python3 generate_embedding.py <reference_pdb_folder> <embedding_save_folder>
