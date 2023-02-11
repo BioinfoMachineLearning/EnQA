@@ -40,7 +40,7 @@ optional arguments:
   --output OUTPUT  Path to output folder.
 ```
 
-Provide the input PDB from AlphaFold2 prediction with per-residue plddt scores stored in the "B-factor" column, and then run EnQA-MSA with the following example:
+The assumption is that the B-factor colulmn of the input PDB file stores the per-residue plddt scores predicted by AlphaFold. Below is a demo example of running EnQA-MSA:
 
 ```
 python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
