@@ -27,7 +27,7 @@ Note: Currently, the dependencies support AMD/Intel based system with Ubuntu 21.
 
 
 
-## EnQA-MSA
+## EnQA-MSA (recommended for estimating the quality of AlphaFold predicted structures)
 
 ```
 usage: EnQA-MSA.py [-h] --input INPUT --output OUTPUT
@@ -40,7 +40,7 @@ optional arguments:
   --output OUTPUT  Path to output folder.
 ```
 
-Provide input PDB from AlphaFold2 prediction with plddt stored in the "B-factor" column, then run EnQA-MSA with the following example:
+Provide the input PDB from AlphaFold2 prediction with per-residue plddt scores stored in the "B-factor" column, and then run EnQA-MSA with the following example:
 
 ```
 python EnQA-MSA.py --input example/enqa-msa/1A09A.pdb --output example/output/
@@ -62,7 +62,7 @@ python3 train_enqa_msa.py --core_data <feature_save_folder> --attn <embedding_sa
 ```
 
 
-## EnQA assisted with AlphaFold2
+## EnQA assisted with AlphaFold2 predictions
 
 ```
 usage: python3 EnQA.py [-h] --input INPUT --output OUTPUT --method METHOD [--cpu] [--alphafold_prediction ALPHAFOLD_PREDICTION] [--alphafold_feature_cache ALPHAFOLD_FEATURE_CACHE] [--af2_pdb AF2_PDB]
@@ -103,7 +103,7 @@ For generating models using AlphaFold2, an installation of AlphaFold2 following 
 
 
 
-### Model training for EnQA assisted with AlphaFold2
+### Model training for EnQA assisted with AlphaFold2 predictions
 First generate 5 AlphaFold reference models per [Generating AlphaFold2 models for assisted quality assessment](https://github.com/BioinfoMachineLearning/EnQA#generating-alphafold2-models-for-assisted-quality-assessment).
 Then generate the labels and features after you have the predicted results from AlphaFold and the corresponding native PDBs:
 ```
@@ -125,7 +125,7 @@ If you need to rebuild the voronota for a different system, please check out the
 Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#spherical-harmonics-featurizer) built for featurizer under a different system. (Currently, only MacOS and Linux are supported)
 
 
-## PDB with multiple chains
+## Applying EnQA to protein complex structures with multiple chains
 For EnQA-MSA, you can preprocess the input PDB with the [mergePDB](https://github.com/BioinfoMachineLearning/EnQA/blob/25c1142fa8936ebb843db79a51161cdee499697a/data/process_alphafold.py#L139) function we provided to convert it into a "merged single chain PDB" and make that as the input PDB.
 
 For EnQA assisted with AlphaFold2, you can provide protein complexes as input, and no additional work is required.
