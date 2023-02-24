@@ -1,6 +1,6 @@
 # EnQA
 
-A 3D-equivariant neural network for protein structure accuracy estimation.
+A 3D-equivariant neural network for protein structure accuracy estimation. It can predict the quality of both tertiary and quaternary structures.
 
 ## Requirements:
 ```
@@ -27,7 +27,7 @@ Note: Currently, the dependencies support AMD/Intel based system with Ubuntu 21.
 
 
 
-## EnQA-MSA (recommended for estimating the quality of AlphaFold predicted structures)
+## EnQA-MSA (recommended for estimating the quality of AlphaFold predicted tertiary structures)
 
 ```
 usage: EnQA-MSA.py [-h] --input INPUT --output OUTPUT
