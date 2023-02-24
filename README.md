@@ -125,8 +125,8 @@ If you need to rebuild the voronota for a different system, please check out the
 Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#spherical-harmonics-featurizer) built for featurizer under a different system. (Currently, only MacOS and Linux are supported)
 
 
-## Applying EnQA to protein complex structures with multiple chains
-EnQA was not trained on protein complex strucures. But interestingly it can be applied to evaluate the quality of protein complex strucutres by treating them as single-chain protein structures.
+## Applying EnQA to protein complex (quaternary) structures with multiple chains
+EnQA was trained on tertiary structures of singel-chain proteins to predict their quality. It was not trained on protein complex strucures. But interestingly it can be applied to evaluate the quality of protein complex strucutres by treating them as single-chain protein structures.
 
 For EnQA-MSA, you can preprocess the input PDB with the [mergePDB](https://github.com/BioinfoMachineLearning/EnQA/blob/25c1142fa8936ebb843db79a51161cdee499697a/data/process_alphafold.py#L139) function we provided to convert it into a "merged single chain PDB" and make that as the input PDB.
 
