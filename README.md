@@ -1,6 +1,6 @@
 # EnQA
 
-A 3D-equivariant neural network for protein structure accuracy estimation. It can predict the quality of both tertiary and quaternary structures.
+A 3D-equivariant graph neural network for protein structure accuracy estimation. It can predict the quality of both tertiary and quaternary structures.
 
 ## Requirements:
 ```
