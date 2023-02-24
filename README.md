@@ -126,6 +126,8 @@ Also, there are [binaries](https://gitlab.inria.fr/GruLab/s-gcn/-/tree/master/#s
 
 
 ## Applying EnQA to protein complex structures with multiple chains
+EnQA was not trained on protein complex strucures. But interestingly it can be applied to evaluate the quality of protein complex strucutres by treating them as single-chain protein structures.
+
 For EnQA-MSA, you can preprocess the input PDB with the [mergePDB](https://github.com/BioinfoMachineLearning/EnQA/blob/25c1142fa8936ebb843db79a51161cdee499697a/data/process_alphafold.py#L139) function we provided to convert it into a "merged single chain PDB" and make that as the input PDB.
 
 For EnQA assisted with AlphaFold2, you can provide protein complexes as input, and no additional work is required.
